@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>האימון היומי של ריף</title>
+<meta name="description" content="5 שאלות כדורגל בחשבון, כל יום">
+<meta property="og:title" content="⚽ האימון היומי של ריף">
+<meta property="og:description" content="5 שאלות בחשבון מחכות לך. כל תשובה נכונה = נקודות">
+<meta property="og:image" content="https://zionhaviv-byte.github.io/reef-football-math/og.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0A1F44">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Rubik:wght@400;500;700&display=swap">
+<style>
+/* Layout: a stadium evening — pitch-striped header with the points scoreboard, then the question card on white */
+:root{
+  --night:#0A1F44; --blau:#1B4D9E; --grana:#A3123F; --gold:#F2C230; --pitch:#2C8A3E; --pitch-2:#33964A;
+  --paper:#F3F6F1; --card:#FFFFFF; --ink:#10213A; --muted:#58697F; --line:#D8E1D6;
+  --good:#1C9B53; --good-soft:#DDF3E5; --bad:#CF3636; --bad-soft:#FBE2E0; --hint:#FFF4CC;
+  --display:"Fredoka","Rubik",system-ui,sans-serif; --body:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-text-size-adjust:100%}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.inner{max-width:560px;margin:0 auto}
+
+/* header: mowed pitch */
+header{background:repeating-linear-gradient(90deg,var(--pitch) 0 44px,var(--pitch-2) 44px 88px);color:#fff;padding-top:env(safe-area-inset-top,0px);position:relative;overflow:hidden}
+header::after{content:"";position:absolute;inset:auto 0 -70px 0;height:140px;border:3px solid rgba(255,255,255,.35);border-radius:50%;width:140px;margin:0 auto;pointer-events:none}
+header .inner{padding-block:16px 22px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+.date{font-size:15px;opacity:.9}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,8vw,42px);line-height:.92;margin:0;text-wrap:balance;text-shadow:0 2px 0 rgba(0,0,0,.18)}
+.board{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+.score{background:var(--night);border:3px solid var(--gold);border-radius:16px;padding:8px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 0 rgba(0,0,0,.25)}
+.score .num{font-family:var(--display);font-weight:700;font-size:44px;line-height:.9;color:var(--gold);direction:ltr;font-variant-numeric:tabular-nums;min-width:2ch;text-align:center}
+.score .lbl{font-size:14px;line-height:1.15;color:#fff}
+.score .lbl b{display:block;font-size:17px}
+.plus{font-family:var(--display);font-weight:700;color:var(--gold);font-size:18px;direction:ltr}
+.streak{background:rgba(10,31,68,.55);border-radius:16px;padding:8px 14px;display:flex;flex-direction:column;justify-content:center;font-size:14px;line-height:1.2}
+.streak b{font-family:var(--display);font-size:24px;color:#fff}
+
+/* progress: 5 balls */
+.balls{display:flex;gap:8px;justify-content:space-between;margin-top:-2px}
+.ball{flex:1;aspect-ratio:1;max-width:58px;border-radius:50%;border:2.5px dashed rgba(255,255,255,.55);display:grid;place-items:center}
+.ball svg{width:88%;height:88%}
+.ball.now{border:3px solid var(--gold)}
+.ball.ok{border:0}
+.ball.miss{border:2.5px solid rgba(255,255,255,.5);background:rgba(0,0,0,.18);color:#fff;font-family:var(--display);font-weight:700;font-size:22px}
+.ball.pop svg{animation:kick .55s ease-out}
+@keyframes kick{0%{transform:translateX(40px) scale(.4) rotate(-200deg)}70%{transform:scale(1.15)}100%{transform:none}}
+
+main .inner{padding-block:18px 28px;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 0 var(--line)}
+.player{display:flex;align-items:center;gap:12px}
+.player img{width:68px;height:68px;border-radius:50%;object-fit:cover;object-position:50% 20%;border:3px solid var(--grana);box-shadow:0 0 0 3px var(--blau);flex:none;background:var(--line)}
+.player .who{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.player .who b{font-family:var(--display);font-size:21px}
+.player .who span{font-size:14px;color:var(--muted)}
+.qno{margin-inline-start:auto;text-align:center;font-size:13px;color:var(--muted);line-height:1.2}
+.qno b{display:block;font-family:var(--display);font-size:22px;color:var(--ink);direction:ltr}
+.cat{align-self:flex-start;background:var(--night);color:#fff;border-radius:999px;padding:2px 12px;font-size:14px;font-weight:500}
+.qtext{font-size:21px;line-height:1.6;font-weight:500;margin:0;text-wrap:pretty}
+.qtext .pl{color:var(--grana);font-weight:700}
+.n{unicode-bidi:isolate;direction:ltr;font-family:var(--display);font-weight:600;color:var(--blau)}
+.x{unicode-bidi:isolate;direction:ltr;white-space:nowrap;font-family:var(--display);font-weight:600}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;font-family:var(--display);font-weight:600;color:var(--grana);margin:0 3px;direction:ltr;font-size:.92em}
+.fr>span:first-child{border-bottom:2px solid currentColor;padding:0 4px 1px}
+.fr>span:last-child{padding-top:2px}
+
+.answer{display:flex;align-items:center;justify-content:center;min-height:84px;border-radius:16px;background:var(--paper);border:2.5px solid var(--line);font-family:var(--display);font-size:42px;font-weight:600;direction:ltr}
+.answer .fr{font-size:34px;color:var(--ink)}
+.answer .ph{color:var(--muted);opacity:.5}
+.answer.ok{border-color:var(--good);background:var(--good-soft)}
+.answer.bad{border-color:var(--bad);background:var(--bad-soft)}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.fb{margin:0;min-height:1.4em;font-weight:500;font-size:18px}
+.fb.good{color:var(--good)} .fb.bad{color:var(--bad)} .fb.info{color:var(--muted)}
+.fb .goal{font-family:var(--display);font-weight:700;font-size:28px;display:block;line-height:1}
+.hint{background:var(--hint);border-radius:14px;padding:12px 14px;font-size:16px;line-height:1.7}
+.hint b{font-family:var(--display);display:block}
+
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;direction:ltr}
+.key{font-family:var(--display);font-size:28px;font-weight:600;min-height:58px;border-radius:14px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;touch-action:manipulation}
+.key small{font-family:var(--body);font-size:12px;font-weight:500;color:var(--muted);margin-top:3px}
+.key:active{transform:scale(.96)}
+.key:focus-visible,.go:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.go{font-family:var(--display);font-size:23px;font-weight:700;min-height:62px;border:0;border-radius:16px;background:var(--grana);color:#fff;cursor:pointer;width:100%;box-shadow:0 4px 0 #6E0A2A;touch-action:manipulation}
+.go:active{transform:translateY(2px);box-shadow:0 2px 0 #6E0A2A}
+.go.next{background:var(--blau);box-shadow:0 4px 0 #0E2F66}
+
+/* final whistle */
+.ft{background:var(--night);color:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;border:3px solid var(--gold)}
+.ft .tag{font-size:14px;color:var(--gold);font-weight:700;letter-spacing:.02em}
+.match{display:flex;align-items:center;justify-content:center;gap:16px;font-family:var(--display)}
+.match .side{display:flex;flex-direction:column;align-items:center;font-size:15px;gap:2px}
+.match .big{font-size:64px;font-weight:700;line-height:.9;color:var(--gold);direction:ltr}
+.match .colon{font-size:44px;font-weight:700;opacity:.7}
+.ft p{margin:0;text-align:center;font-size:18px}
+.ft .earn{font-family:var(--display);font-size:26px;color:var(--gold);text-align:center;line-height:1}
+.results{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.results li{display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:10px;padding:8px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.results img{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:50% 20%}
+.mark{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px}
+.mark.y{background:var(--good-soft);color:var(--good)} .mark.n2{background:var(--bad-soft);color:var(--bad)}
+.results .t{font-size:15px;color:var(--muted)} .results .t b{color:var(--ink);font-weight:500}
+.results .pts{font-family:var(--display);font-weight:700;direction:ltr;color:var(--blau)}
+.note{color:var(--muted);text-align:center;margin:0;font-size:15px}
+.sendfail{background:var(--hint);border-radius:14px;padding:10px 14px;font-size:15px}
+footer{color:var(--muted);font-size:12px;line-height:1.5}
+footer .inner{padding-block:4px 28px}
+footer a{color:inherit}
+@media (prefers-reduced-motion: reduce){.ball.pop svg,.shake{animation:none}}
+</style>
+</head>
+<body>
+<header class="gut"><div class="inner">
+  <div class="date" id="date"></div>
+  <h1 id="title">האימון היומי של ריף</h1>
+  <div class="board">
+    <div class="score" aria-live="polite"><span class="num" id="points">–</span><span class="lbl"><b>נקודות</b>שצברת</span><span class="plus" id="plus"></span></div>
+    <div class="streak" id="streak" hidden></div>
+  </div>
+  <div class="balls" id="balls" aria-label="ההתקדמות של היום"></div>
+</div></header>
+
+<main class="gut"><div class="inner" id="main"></div></main>
+
+<footer class="gut"><div class="inner" id="credits"></div></footer>
+
+<script type="module">
+import { genDay, isRight, pointsFor, PLAYERS, NAME, TOTAL } from './questions.js?v=1';
+
+const $ = id => document.getElementById(id);
+const keyOf = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+let dayKey = keyOf(new Date());
+let Q = genDay(dayKey);
+
+/* local progress for the current day (so a reload continues where he stopped) */
+const LS = k => 'reef-fb-' + k;
+function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LS(dayKey))) || {results:[]} }catch(e){ return {results:[]} } }
+function saveLocal(){ try{ localStorage.setItem(LS(dayKey), JSON.stringify(local)) }catch(e){} }
+let local = loadLocal();
+
+let server = { points: null, today: null, streak: 0 };
+let cur = { input:'', tries:0, resolved:false, fb:null, hint:false, shake:false, pop:-1 };
+let sending = false;
+
+const BALL = '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#fff" stroke="#10213A" stroke-width="2"/><path d="M20 12.5l7 5-2.7 8.2h-8.6L13 17.5z" fill="#10213A"/><path d="M20 12.5V3.5M27 17.5l8.3-2.8M24.3 25.7l5.2 7M15.7 25.7l-5.2 7M13 17.5l-8.3-2.8" stroke="#10213A" stroke-width="2" fill="none"/></svg>';
+const photo = k => `players/${k}.jpg`;
+
+/* ---------- results: sent to a private channel; a script on the home PC checks them,
+   adds the points, updates points.json here and has Zizo send Zion a summary ---------- */
+const CHANNEL = 'https://ntfy.sh/reef-fbm-173fcccfbece64e956d1';
+async function refresh(){
+  try{
+    const r = await fetch('points.json?t=' + Date.now(), { cache:'no-store' });
+    if(r.ok){
+      const s = await r.json();
+      server = { points: s.points || 0, streak: s.streak || 0, today: (s.days || {})[dayKey] || null };
+      render();
+    }
+  }catch(e){ /* offline: keep playing */ }
+  if(local.results.length >= TOTAL && !local.sent && !server.today) submit();
+}
+async function submit(){
+  if(sending) return; sending = true; render();
+  try{
+    const body = JSON.stringify({ app:'reef-fbm', date: dayKey, answers: local.results.map(r => ({ given:r.given, tries:r.tries })), sentAt: new Date().toISOString() });
+    const r = await fetch(CHANNEL, { method:'POST', body });
+    if(!r.ok) throw new Error('http ' + r.status);
+    local.sent = true; local.sendError = false; saveLocal();
+  }catch(e){ local.sendError = true; saveLocal(); }
+  sending = false; render();
+}
+
+/* ---------- input ---------- */
+function inputHtml(s){
+  if(!s) return '<span class="ph">?</span>';
+  if(s.includes('/')){ const [a,b] = s.split('/'); return `<span class="fr"><span>${a||'&nbsp;'}</span><span>${b||'&nbsp;&nbsp;'}</span></span>`; }
+  return s;
+}
+function press(k){
+  if(cur.resolved || finished()) return;
+  if(k === 'back') cur.input = cur.input.slice(0,-1);
+  else if(k === '/'){ if(cur.input && !cur.input.includes('/')) cur.input += '/'; }
+  else if(cur.input.replace('/','').length < 6) cur.input += k;
+  cur.fb = null;
+  const el = $('ans'); if(el) el.innerHTML = inputHtml(cur.input);
+  const fb = $('fb'); if(fb){ fb.className = 'fb'; fb.textContent = ''; }
+}
+const GOALS = ['גוווול!','איזה שער!','בול בחיבורים!','גול של אלופים!','פגיעה מושלמת!'];
+function check(){
+  if(cur.resolved){ next(); return; }
+  const i = local.results.length, q = Q[i];
+  if(!/^\d+(\/\d+)?$/.test(cur.input)){
+    cur.fb = { t:'info', m: cur.input.includes('/') ? 'צריך לכתוב גם את המספר העליון וגם את התחתון של השבר' : 'קודם כותבים תשובה' };
+    render(); return;
+  }
+  cur.tries++;
+  if(isRight(cur.input, q.answer)){
+    const pts = cur.tries === 1 ? 10 : 5;
+    cur.fb = { t:'good', m:`<span class="goal">${GOALS[i % GOALS.length]}</span>+${pts} נקודות` + (cur.tries === 2 ? ', הצלחת בניסיון השני' : '') };
+    resolve(true);
+  } else if(cur.tries < 2){
+    cur.fb = { t:'bad', m:'כמעט! הכדור פגע בקורה. הנה רמז, נסה שוב' };
+    cur.hint = true; cur.input = ''; cur.shake = true;
+  } else {
+    cur.fb = { t:'bad', m:'הפעם החמצת. התשובה הנכונה היא ' + q.ans };
+    cur.hint = true;
+    resolve(false);
+  }
+  render();
+}
+function resolve(ok){
+  local.results.push({ ok, tries: cur.tries, given: cur.input });
+  cur.resolved = true; cur.pop = local.results.length - 1;
+  saveLocal();
+  if(local.results.length >= TOTAL) submit();
+}
+function next(){
+  cur = { input:'', tries:0, resolved:false, fb:null, hint:false, shake:false, pop:-1 };
+  render(); window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+const finished = () => !!server.today || local.results.length >= TOTAL;
+
+/* ---------- render ---------- */
+function localEarned(){ return local.results.reduce((s,r) => s + pointsFor(r), 0); }
+function renderHeader(){
+  $('date').textContent = new Date().toLocaleDateString('he-IL', { weekday:'long', day:'numeric', month:'long' });
+  const pendingEarn = server.today ? 0 : localEarned();   // until the home PC confirms, count today's points here
+  $('points').textContent = server.points === null ? (pendingEarn || '–') : server.points + pendingEarn;
+  $('plus').textContent = !server.today && pendingEarn ? `+${pendingEarn} היום` : '';
+  const st = $('streak');
+  if(server.streak > 0){ st.hidden = false; st.innerHTML = `<b>${server.streak}</b>${server.streak === 1 ? 'יום ברצף' : 'ימים ברצף'}`; } else st.hidden = true;
+
+  const res = server.today ? server.today.items.map(x => ({ ok:x.ok, tries:x.tries })) : local.results;
+  const at = res.length;
+  $('balls').innerHTML = Array.from({ length: TOTAL }, (_, i) => {
+    const r = res[i];
+    if(r) return r.ok ? `<div class="ball ok${i === cur.pop ? ' pop' : ''}" role="img" aria-label="שאלה ${i+1}: נכון">${BALL}</div>`
+                      : `<div class="ball miss" role="img" aria-label="שאלה ${i+1}: לא נכון">✗</div>`;
+    return `<div class="ball${i === at && !finished() ? ' now' : ''}" role="img" aria-label="שאלה ${i+1}"></div>`;
+  }).join('');
+}
+function renderQuiz(){
+  const idx = cur.resolved ? local.results.length - 1 : local.results.length, q = Q[idx], pl = PLAYERS[q.player];
+  const last = idx === TOTAL - 1;
+  const r = cur.resolved ? local.results[idx] : null;
+  const keys = ['1','2','3','4','5','6','7','8','9'].map(k => `<button class="key" data-k="${k}" type="button">${k}</button>`).join('')
+    + `<button class="key" data-k="/" type="button" aria-label="קו שבר">⁄<small>שבר</small></button>`
+    + `<button class="key" data-k="0" type="button">0</button>`
+    + `<button class="key" data-k="back" type="button" aria-label="מחיקה">⌫<small>מחיקה</small></button>`;
+  $('main').innerHTML = `<section class="card" aria-live="polite">
+    <div class="player"><img src="${photo(q.player)}" alt="${pl.he}" width="68" height="68"><div class="who"><b>${pl.he}</b><span>${pl.team}</span></div>
+      <div class="qno">שאלה<b>${idx+1}/${TOTAL}</b></div></div>
+    <span class="cat">${q.cat}</span>
+    <p class="qtext">${q.html}</p>
+    <div class="answer${r ? (r.ok ? ' ok' : ' bad') : ''}${cur.shake ? ' shake' : ''}" id="ans" aria-label="התשובה שלך">${inputHtml(r ? r.given : cur.input)}</div>
+    <p class="fb ${cur.fb ? cur.fb.t : ''}" id="fb">${cur.fb ? cur.fb.m : ''}</p>
+    ${cur.hint ? `<div class="hint"><b>${cur.resolved ? 'איך פותרים' : 'רמז מהמאמן'}</b>${q.hint}</div>` : ''}
+    ${cur.resolved ? '' : `<div class="pad" id="pad">${keys}</div>`}
+    <button class="go${cur.resolved ? ' next' : ''}" id="go" type="button">${cur.resolved ? (last ? 'שריקת סיום: לתוצאות' : 'לשאלה הבאה') : 'בעיטה לשער!'}</button>
+  </section>`;
+  const pad = $('pad'); if(pad) pad.addEventListener('click', e => { const b = e.target.closest('[data-k]'); if(b) press(b.dataset.k); });
+  $('go').addEventListener('click', check);
+  cur.shake = false;
+}
+function untilTomorrow(){
+  const now = new Date(), t = new Date(now); t.setHours(24,0,0,0);
+  const mins = Math.max(1, Math.round((t - now) / 60000)), h = Math.floor(mins / 60), m = mins % 60;
+  const hs = h === 0 ? '' : h === 1 ? 'שעה' : h === 2 ? 'שעתיים' : `${h} שעות`, ms = m === 0 ? '' : m === 1 ? 'דקה' : `${m} דקות`;
+  return [hs, ms].filter(Boolean).join(' ו');
+}
+function renderDone(){
+  const day = server.today;
+  const rows = Q.map((q, i) => {
+    const r = day ? day.items[i] : local.results[i]; const ok = r && r.ok; const pts = day ? r.pts : pointsFor(r);
+    return `<li><img src="${photo(q.player)}" alt="" width="38" height="38"><span class="mark ${ok ? 'y' : 'n2'}" aria-label="${ok ? 'נכון' : 'לא נכון'}">${ok ? '✓' : '✗'}</span>
+      <span class="t">${q.cat} · התשובה: <b>${q.ans}</b></span><span class="pts">${pts ? '+' + pts : '0'}</span></li>`;
+  }).join('');
+  const score = day ? day.score : local.results.filter(r => r.ok).length;
+  const earned = day ? day.earned : localEarned();
+  const msg = score === 5 ? `משחק מושלם, ${NAME}! כמו יאמל ביום הכי טוב שלו.` : score === 4 ? `כמעט מושלם! קוברסי היה גאה בהגנה הזאת.` : score === 3 ? `ניצחון יפה! עוד קצת אימון וזה בכיס.` : `גם האלופים מפסידים לפעמים. מחר יש משחק חדש.`;
+  $('main').innerHTML = `<section class="ft">
+      <span class="tag">שריקת סיום</span>
+      <div class="match"><div class="side"><span class="big">${score}</span>${NAME}</div><span class="colon">:</span><div class="side"><span class="big">${TOTAL - score}</span>החמצות</div></div>
+      <p class="earn">+${earned} נקודות</p>
+      <p>${msg}</p>
+    </section>
+    ${!day && local.sendError && !sending ? `<div class="sendfail">אין חיבור כרגע. התוצאות יישלחו לבד כשיהיה אינטרנט. <button class="go next" id="retry" type="button" style="margin-top:8px;min-height:48px;font-size:18px">לשלוח שוב</button></div>` : ''}
+    <ul class="results">${rows}</ul>
+    <p class="note" id="next-day">5 שאלות חדשות יחכו לך מחר, בעוד ${untilTomorrow()}.</p>`;
+  const rb = $('retry'); if(rb) rb.addEventListener('click', () => { local.sendError = false; submit(); });
+}
+function render(){
+  $('title').textContent = finished() && !cur.resolved ? 'האימון של היום הושלם' : `${NAME}, האימון היומי שלך`;
+  renderHeader();
+  if(finished() && !cur.resolved) renderDone(); else renderQuiz();
+  cur.pop = -1;
+}
+
+/* credits for the photos (CC BY-SA 4.0, Wikimedia Commons) */
+$('credits').innerHTML = 'תמונות השחקנים: Bryan Berlin, <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">ויקישיתוף</a>, ברישיון <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.he" target="_blank" rel="noopener">CC BY-SA 4.0</a>. האתר לא קשור למועדון ברצלונה.';
+
+document.addEventListener('keydown', e => {
+  if(/^[0-9]$/.test(e.key)) press(e.key);
+  else if(e.key === '/' || e.key === '.') press('/');
+  else if(e.key === 'Backspace') press('back');
+  else if(e.key === 'Enter' && $('go')){ e.preventDefault(); check(); }
+});
+setInterval(() => {
+  const k = keyOf(new Date());
+  if(k !== dayKey){ dayKey = k; Q = genDay(k); local = loadLocal(); server.today = null; next(); refresh(); }
+  else { const nd = $('next-day'); if(nd) nd.textContent = `5 שאלות חדשות יחכו לך מחר, בעוד ${untilTomorrow()}.`; }
+}, 30000);
+
+render();
+refresh();
+</script>
+</body>
+</html>
