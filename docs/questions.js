@@ -37,8 +37,9 @@ export function toPlain(html){
 }
 
 /* ---------- fractions ---------- */
+// g.easy = the easier level 1 (Zion 16.11.26, after Reef's teacher said it is hard): one step only, small numbers
 function fracOf(g,p){
-  const d=g.pick([2,3,4,5,6,8,10]), a=d===2?1:g.ri(1,d-1), k=g.ri(2,d>=8?6:12), T=d*k, part=k*a, fr=F(a,d);
+  const d=g.easy?g.pick([2,3,4,5]):g.pick([2,3,4,5,6,8,10]), a=d===2||g.easy?1:g.ri(1,d-1), k=g.easy?g.ri(2,10):g.ri(2,d>=8?6:12), T=d*k, part=k*a, fr=F(a,d);
   const html=g.pick([
     ()=>`${P(p)} בעט ${N(T)} בעיטות לשער באימון. ${fr} מהבעיטות נכנסו לרשת. כמה בעיטות נכנסו לרשת?`,
     ()=>`במשחק של ברצלונה ${P(p)} מסר ${N(T)} מסירות. ${fr} מהמסירות היו מסירות קדימה. כמה מסירות קדימה הוא מסר?`,
@@ -49,7 +50,7 @@ function fracOf(g,p){
     hint:`קודם מחלקים את ${N(T)} ל-${N(d)} חלקים שווים: ${X(`${T} ÷ ${d} = ${k}`)}. `+(a>1?`ואז לוקחים ${N(a)} חלקים: ${X(`${k} × ${a}`)}.`:`לוקחים חלק אחד, אז זו התשובה.`)};
 }
 function fracAdd(g,p){
-  const d=g.pick([5,6,7,8,9,10,12]), a=g.ri(1,d-2), b=g.ri(1,d-1-a), s=a+b;
+  const d=g.easy?g.pick([3,4,5,6]):g.pick([5,6,7,8,9,10,12]), a=g.ri(1,d-2), b=g.ri(1,d-1-a), s=a+b;
   const html=g.pick([
     ()=>`${P(p)} שתה ${F(a,d)} מבקבוק המים במחצית הראשונה, ועוד ${F(b,d)} מהבקבוק במחצית השנייה. איזה חלק מהבקבוק הוא שתה?`,
     ()=>`ביום ראשון ${NAME} צבע ${F(a,d)} מהציור של ${P(p)}, וביום שני עוד ${F(b,d)} מהציור. איזה חלק מהציור הוא צבע בסך הכול?`,
@@ -59,7 +60,7 @@ function fracAdd(g,p){
     hint:`כשהמכנים שווים, מחברים רק את המונים: ${X(`${a} + ${b} = ${s}`)}, והמכנה נשאר ${N(d)}. כותבים שבר עם הכפתור ⁄.`};
 }
 function fracSub(g,p){
-  const d=g.pick([3,4,5,6,8,10]), a=g.ri(1,d-1);
+  const d=g.easy?g.pick([2,3,4,5]):g.pick([3,4,5,6,8,10]), a=g.ri(1,d-1);
   const html=g.pick([
     ()=>`${P(p)} כבר סיים ${F(a,d)} מהאימון של היום. איזה חלק מהאימון נשאר לו?`,
     ()=>`${F(a,d)} מהכרטיסים למשחק של ברצלונה כבר נמכרו. איזה חלק מהכרטיסים עוד לא נמכר?`,
@@ -130,6 +131,7 @@ function mul1(g,p){
 // level 1 mixes both kinds (Zion, 16.11.26: "גם וגם, לא רק לוח הכפל"): mul1 = the table, mul2 = something bigger
 function mul2(g,p){
   const L=g.lvl;
+  if(L===1&&g.easy) return g.ri(0,1)===0?mulStory(g,p,g.ri(1,5)*10,g.ri(2,5)):mulStory(g,p,g.ri(11,20),g.ri(2,3));
   if(L===1) return g.ri(0,1)===0?mulStory(g,p,g.ri(2,9)*10,g.ri(2,9)):mulStory(g,p,g.ri(12,29),g.ri(2,5));
   if(L===2) return g.ri(0,1)===0?mulStory(g,p,g.ri(12,48),g.pick([10,20,30])):mulStory(g,p,g.ri(101,250),g.ri(2,4));
   if(L===3) return mulStory(g,p,g.ri(12,48),g.pick([20,30,40,50,11,12,13,14,15]));
@@ -138,7 +140,8 @@ function mul2(g,p){
 function area(g,p){
   const L=g.lvl;
   let w,h;
-  if(L===1){w=g.ri(5,10);h=g.ri(3,w-1);}
+  if(L===1&&g.easy){w=g.ri(3,9);h=g.ri(2,Math.min(5,w-1));}
+  else if(L===1){w=g.ri(5,10);h=g.ri(3,w-1);}
   else if(L===2){w=g.pick([10,20,30]);h=g.ri(4,12);}
   else if(L===3){w=g.pick([20,30,40,50]);h=g.ri(11,25);}
   else {w=g.ri(21,45);h=g.ri(12,w-3);}
@@ -175,7 +178,7 @@ function figBox(a,b,c){ return FIG('0 0 260 190',
   (a?LBL(100,188,a):'')+(b?LBL(206,166,b,'start'):'')+(c?LBL(22,126,c,'end'):'')); }
 
 function rectPerim(g,p){
-  const L=g.lvl, w=L===1?g.ri(5,12):L===2?g.ri(4,10)*5:g.ri(4,10)*10, h=L===1?g.ri(2,w-2):L===2?g.ri(2,w/5-1)*5:g.ri(2,w/10-1)*10;
+  const L=g.lvl, w=L===1?g.ri(g.easy?3:5,g.easy?10:12):L===2?g.ri(4,10)*5:g.ri(4,10)*10, h=L===1?g.ri(2,w-2):L===2?g.ri(2,w/5-1)*5:g.ri(2,w/10-1)*10;
   const html=g.pick([
     ()=>`${P(p)} רץ סיבוב אחד מסביב למגרש אימון בצורת מלבן, באורך ${N(w)} מטר וברוחב ${N(h)} מטר. כמה מטרים הוא רץ?`,
     ()=>`${NAME} רוצה לצבוע קו לבן מסביב למגרש קטן בצורת מלבן, באורך ${N(w)} מטר וברוחב ${N(h)} מטר. כמה מטרים של קו הוא צריך לצבוע?`
@@ -198,7 +201,7 @@ function missingSide(g,p){
     hint:`שטח = אורך × רוחב, אז שואלים: ${N(w)} כפול כמה זה ${N(A)}? כלומר ${X(`${A} ÷ ${w}`)}.`};
 }
 function triangle(g,p){
-  const v=g.ri(0,2), s=g.ri(3,15), b=g.ri(3,12);
+  const v=g.easy?g.pick([0,2]):g.ri(0,2), s=g.easy?g.ri(2,10):g.ri(3,15), b=g.ri(3,g.easy?9:12);
   if(v===0) return {cat:'הנדסה · משולש',html:`דגלון פינה בצורת משולש שווה צלעות. כל צלע ${N(s)} סנטימטר. מה ההיקף של הדגלון?`,answer:3*s,ans:N(3*s),fig:figTri(s,s,s),
     hint:`במשולש שווה צלעות כל 3 הצלעות שוות: ${X(`${s} × 3`)}.`};
   if(v===1) return {cat:'הנדסה · משולש',html:`למשולש שווה צלעות יש היקף של ${N(3*s)} סנטימטר. מה האורך של כל צלע?`,answer:s,ans:N(s),fig:figTri('?','?','?'),
@@ -207,7 +210,7 @@ function triangle(g,p){
     hint:`במשולש שווה שוקיים שתי השוקיים שוות: ${X(`${s} + ${s} + ${b}`)}.`};
 }
 function box(g,p){
-  const L=g.lvl, v=g.ri(0,2);
+  const L=g.lvl, v=g.easy?0:g.ri(0,2);   // easy: only how many faces / edges / vertices
   if(v===0){const n=g.ri(2,L===1?5:9), part=g.pick([['פאות',6,'פאה'],['מקצועות',12,'מקצוע'],['קודקודים',8,'קודקוד']]);
     return {cat:'הנדסה · תיבה',html:`הנעליים החדשות של ${P(p)} הגיעו בקופסה בצורת תיבה. במחסן יש ${N(n)} קופסאות כאלה. כמה ${part[0]} יש לכל הקופסאות ביחד?`,answer:n*part[1],ans:N(n*part[1]),fig:figBox('','',''),
       hint:`לכל תיבה יש ${N(6)} פאות, ${N(12)} מקצועות ו-${N(8)} קודקודים. לקופסה אחת יש ${N(part[1])} ${part[0]}, אז: ${X(`${part[1]} × ${n}`)}.`};}
@@ -262,7 +265,7 @@ function time(g,p){
   if(v===0){const m=g.ri(12,64);
     return {cat:'זמן',html:`משחק כדורגל נמשך ${N(90)} דקות. ${P(p)} נכנס כמחליף ושיחק ${N(m)} דקות עד הסוף. כמה דקות הוא ישב על הספסל?`,answer:90-m,ans:N(90-m),
       hint:`מחסרים מכל המשחק את הזמן ששיחק: ${X(`90 − ${m}`)}.`};}
-  if(v===1){const n=g.ri(3,8);
+  if(v===1){const n=g.easy?g.ri(2,4):g.ri(3,8);
     return {cat:'זמן',html:`החודש ברצלונה שיחקה ${N(n)} משחקים, וכל משחק נמשך ${N(90)} דקות. כמה דקות כדורגל היא שיחקה החודש?`,answer:90*n,ans:N(90*n),
       hint:`${X(`90 × ${n}`)}. טיפ: ${X(`9 × ${n} = ${9*n}`)}, ומוסיפים אפס.`};}
   const h=g.ri(1,3), m=g.pick([10,15,20,25,30,40,45,50]);
@@ -275,13 +278,17 @@ export function genDay(key, level=1, round=1){
   const lvl=Math.min(MAX_LEVEL,Math.max(1,parseInt(level,10)||1));
   const rd=Math.min(MAX_ROUND,Math.max(1,parseInt(round,10)||1));
   const r=rng(seedOf('reef-football-g4|'+key+'|L'+lvl+(rd>1?'|R'+rd:'')));
-  const g={lvl,ri:(a,b)=>a+Math.floor(r()*(b-a+1)),pick:arr=>arr[Math.floor(r()*arr.length)]};
+  // easier level 1 from 17.11.26 (Reef's teacher: too hard). 16.11 rounds 1-2 were already played, so they keep the old questions
+  const easy=lvl===1&&(key>'2026-11-16'||rd>=3);
+  const g={lvl,easy,ri:(a,b)=>a+Math.floor(r()*(b-a+1)),pick:arr=>arr[Math.floor(r()*arr.length)]};
   const shuffle=arr=>{const c=arr.slice();for(let i=c.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[c[i],c[j]]=[c[j],c[i]]}return c};
   // every day: a fraction, the multiplication table kind (mul1), a bigger multiplication (mul2), a geometry
-  // question, and one more: a second fraction (most days), division, two steps or time
-  const fr=shuffle([fracOf,fracAdd,fracSub,fracRemain]);
-  const geo=g.pick([area,rectPerim,square,missingSide,triangle,box,box,polygons]);
-  const extra=g.pick([fr[1],fr[1],div,multiStep,time]);
+  // question, and one more: a second fraction (most days), division, two steps or time.
+  // easy: no two-step questions ("כמה נשארו" after a fraction, change from a bill), no "find the side from the area",
+  // no box edges / volume
+  const fr=shuffle(easy?[fracOf,fracOf,fracAdd,fracSub]:[fracOf,fracAdd,fracSub,fracRemain]);
+  const geo=g.pick(easy?[area,rectPerim,square,triangle,box,polygons]:[area,rectPerim,square,missingSide,triangle,box,box,polygons]);
+  const extra=g.pick(easy?[fr[1],div,time]:[fr[1],fr[1],div,multiStep,time]);
   const used=new Set();
   return shuffle([fr[0],mul1,mul2,geo,extra]).map(f=>{
     // a different player for each question when possible
