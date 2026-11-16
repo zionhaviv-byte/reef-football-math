@@ -158,15 +158,19 @@ const photo = k => `players/${k}.jpg`;
    adds the points, updates points.json here and has Zizo send Zion a summary ---------- */
 const CHANNEL = 'https://ntfy.sh/reef-fbm-173fcccfbece64e956d1';
 async function refresh(){
+  let fresh = false;
   try{
     const r = await fetch('points.json?t=' + Date.now(), { cache:'no-store' });
     if(r.ok){
       const s = await r.json();
       server = { points: s.points || 0, streak: s.streak || 0, today: (s.days || {})[dayKey] || null };
-      render();
+      fresh = true; render();
     }
   }catch(e){ /* offline: keep playing */ }
-  if(local.results.length >= TOTAL && !local.sent && !server.today) submit();
+  // finished but the home PC has not counted it yet: send it (again if it was sent over 2 hours ago,
+  // in case the PC was off; the PC counts only the first result of each day)
+  const stale = local.sentAt && Date.now() - local.sentAt > 2 * 3600 * 1000;
+  if(local.results.length >= TOTAL && !server.today && (!local.sent || (fresh && stale))) submit();
 }
 async function submit(){
   if(sending) return; sending = true; render();
@@ -174,7 +178,7 @@ async function submit(){
     const body = JSON.stringify({ app:'reef-fbm', date: dayKey, answers: local.results.map(r => ({ given:r.given, tries:r.tries })), sentAt: new Date().toISOString() });
     const r = await fetch(CHANNEL, { method:'POST', body });
     if(!r.ok) throw new Error('http ' + r.status);
-    local.sent = true; local.sendError = false; saveLocal();
+    local.sent = true; local.sentAt = Date.now(); local.sendError = false; saveLocal();
   }catch(e){ local.sendError = true; saveLocal(); }
   sending = false; render();
 }
