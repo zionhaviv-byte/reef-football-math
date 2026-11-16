@@ -140,11 +140,14 @@ footer a{color:inherit}
 <footer class="gut"><div class="inner" id="credits"></div></footer>
 
 <script type="module">
-import { genDay, isRight, pointsFor, levelFor, LEVEL_NAMES, PLAYERS, NAME, TOTAL } from './questions.js?v=2';
+import { genDay, isRight, pointsFor, levelFor, LEVEL_NAMES, PLAYERS, NAME, TOTAL, MAX_ROUND } from './questions.js?v=3';
 
 const $ = id => document.getElementById(id);
 const keyOf = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 let dayKey = keyOf(new Date());
+// a retry link from Zizo: ?r=2&d=YYYY-MM-DD -> 5 new questions for that day (only on that day; otherwise today's quiz)
+const URLP = new URLSearchParams(location.search);
+const ROUND = (() => { const r = parseInt(URLP.get('r'), 10) || 1; return r > 1 && r <= MAX_ROUND && URLP.get('d') === dayKey ? r : 1; })();
 // the level (1-4) comes from points.json, kept in this browser too in case it is offline
 function loadLevels(){ try{ return JSON.parse(localStorage.getItem('reef-fb-levels')) || [] }catch(e){ return [] } }
 let levels = loadLevels();
@@ -152,17 +155,17 @@ let level = 1;
 let Q = [];
 
 /* local progress for the current day (so a reload continues where he stopped) */
-const LS = k => 'reef-fb-' + k;
+const LS = k => 'reef-fb-' + k + (ROUND > 1 ? '-r' + ROUND : '');
 function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LS(dayKey))) || {results:[]} }catch(e){ return {results:[]} } }
 function saveLocal(){ try{ localStorage.setItem(LS(dayKey), JSON.stringify(local)) }catch(e){} }
 let local = loadLocal();
 function pickLevel(){
   // a day that already started keeps its level; otherwise the level in force today
-  const l = (server && server.today && server.today.level) || local.level || levelFor(dayKey, levels);
-  if(l !== level || !Q.length){ level = l; Q = genDay(dayKey, level); }
+  const l = (server && server.today && server.today.level) || (server && server.best && server.best.level) || local.level || levelFor(dayKey, levels);
+  if(l !== level || !Q.length){ level = l; Q = genDay(dayKey, level, ROUND); }
 }
 
-let server = { points: null, today: null, streak: 0 };
+let server = { points: null, today: null, best: null, streak: 0 };
 let cur = { input:'', tries:0, resolved:false, fb:null, hint:false, shake:false, pop:-1 };
 let sending = false;
 pickLevel();
@@ -179,7 +182,10 @@ async function refresh(){
     const r = await fetch('points.json?t=' + Date.now(), { cache:'no-store' });
     if(r.ok){
       const s = await r.json();
-      server = { points: s.points || 0, streak: s.streak || 0, today: (s.days || {})[dayKey] || null };
+      // days[date] = the best round of the day; days[date].rounds[n] = each round that was counted
+      const d = (s.days || {})[dayKey] || null;
+      server = { points: s.points || 0, streak: s.streak || 0, best: d,
+                 today: d ? ((d.rounds || { 1: d })[ROUND] || null) : null };
       levels = s.levels || [];
       try{ localStorage.setItem('reef-fb-levels', JSON.stringify(levels)); }catch(e){}
       if(!cur.resolved) pickLevel();
@@ -194,7 +200,7 @@ async function refresh(){
 async function submit(){
   if(sending) return; sending = true; render();
   try{
-    const body = JSON.stringify({ app:'reef-fbm', date: dayKey, level, answers: local.results.map(r => ({ given:r.given, tries:r.tries })), sentAt: new Date().toISOString() });
+    const body = JSON.stringify({ app:'reef-fbm', date: dayKey, level, round: ROUND, answers: local.results.map(r => ({ given:r.given, tries:r.tries })), sentAt: new Date().toISOString() });
     const r = await fetch(CHANNEL, { method:'POST', body });
     if(!r.ok) throw new Error('http ' + r.status);
     local.sent = true; local.sentAt = Date.now(); local.sendError = false; saveLocal();
@@ -255,9 +261,11 @@ const finished = () => !!server.today || local.results.length >= TOTAL;
 
 /* ---------- render ---------- */
 function localEarned(){ return local.results.reduce((s,r) => s + pointsFor(r), 0); }
+// a retry adds only what it improves on the best result of the day
+function localGain(){ return Math.max(0, localEarned() - (server.best ? server.best.earned : 0)); }
 function renderHeader(){
   $('date').textContent = new Date().toLocaleDateString('he-IL', { weekday:'long', day:'numeric', month:'long' });
-  const pendingEarn = server.today ? 0 : localEarned();   // until the home PC confirms, count today's points here
+  const pendingEarn = server.today ? 0 : localGain();   // until the home PC confirms, count today's points here
   $('points').textContent = server.points === null ? (pendingEarn || '–') : server.points + pendingEarn;
   $('plus').textContent = !server.today && pendingEarn ? `+${pendingEarn} היום` : '';
   $('level').innerHTML = `<b>רמה ${level}</b>${LEVEL_NAMES[level]}`;
@@ -320,20 +328,25 @@ function renderDone(){
   }).join('');
   const score = day ? day.score : local.results.filter(r => r.ok).length;
   const earned = day ? day.earned : localEarned();
+  const gain = ROUND === 1 ? earned : day ? (day.gain || 0) : localGain();
+  const again = ROUND < MAX_ROUND ? `<p class="note">רוצה לשפר את התוצאה? תכתוב לזיזו <b>אימון חוזר</b> ⚽</p>` : '';
   const msg = score === 5 ? `משחק מושלם, ${NAME}! כמו יאמל ביום הכי טוב שלו.` : score === 4 ? `כמעט מושלם! קוברסי היה גאה בהגנה הזאת.` : score === 3 ? `ניצחון יפה! עוד קצת אימון וזה בכיס.` : `גם האלופים מפסידים לפעמים. מחר יש משחק חדש.`;
   $('main').innerHTML = `<section class="ft">
       <span class="tag">שריקת סיום</span>
       <div class="match"><div class="side"><span class="big">${score}</span>${NAME}</div><span class="colon">:</span><div class="side"><span class="big">${TOTAL - score}</span>החמצות</div></div>
-      <p class="earn">+${earned} נקודות</p>
+      <p class="earn">+${gain} נקודות</p>
+      ${ROUND > 1 ? `<p><b>${gain ? 'שיפרת את התוצאה של היום! 📈' : 'הפעם לא שיפרת, התוצאה הכי טובה שלך היום נשארת.'}</b></p>` : ''}
       <p>${msg}</p>
     </section>
     ${!day && local.sendError && !sending ? `<div class="sendfail">אין חיבור כרגע. התוצאות יישלחו לבד כשיהיה אינטרנט. <button class="go next" id="retry" type="button" style="margin-top:8px;min-height:48px;font-size:18px">לשלוח שוב</button></div>` : ''}
     <ul class="results">${rows}</ul>
+    ${again}
     <p class="note" id="next-day">5 שאלות חדשות יחכו לך מחר, בעוד ${untilTomorrow()}.</p>`;
   const rb = $('retry'); if(rb) rb.addEventListener('click', () => { local.sendError = false; submit(); });
 }
 function render(){
-  $('title').textContent = finished() && !cur.resolved ? 'האימון של היום הושלם' : `${NAME}, האימון היומי שלך`;
+  $('title').textContent = ROUND > 1 ? (finished() && !cur.resolved ? 'האימון החוזר הושלם' : `${NAME}, אימון חוזר`)
+    : finished() && !cur.resolved ? 'האימון של היום הושלם' : `${NAME}, האימון היומי שלך`;
   renderHeader();
   if(finished() && !cur.resolved) renderDone(); else renderQuiz();
   cur.pop = -1;
@@ -350,7 +363,7 @@ document.addEventListener('keydown', e => {
 });
 setInterval(() => {
   const k = keyOf(new Date());
-  if(k !== dayKey){ dayKey = k; local = loadLocal(); server.today = null; Q = []; pickLevel(); next(); refresh(); }
+  if(k !== dayKey && ROUND === 1){ dayKey = k; local = loadLocal(); server.today = null; Q = []; pickLevel(); next(); refresh(); }
   else { const nd = $('next-day'); if(nd) nd.textContent = `5 שאלות חדשות יחכו לך מחר, בעוד ${untilTomorrow()}.`; }
 }, 30000);
 

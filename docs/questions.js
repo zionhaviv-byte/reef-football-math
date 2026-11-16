@@ -269,9 +269,12 @@ function time(g,p){
   return {cat:'זמן',html:`${P(p)} התאמן ${hours(h)} ו-${N(m)} דקות. כמה דקות הוא התאמן בסך הכול?`,answer:h*60+m,ans:N(h*60+m),
     hint:`בכל שעה יש ${N(60)} דקות: ${X(`${h} × 60 = ${h*60}`)}. ועכשיו מוסיפים עוד ${N(m)} דקות.`};
 }
-export function genDay(key, level=1){
+// round 2+ = a retry ("אימון חוזר", Zion 16.11.26): 5 new questions, same day and level. Round 1 keeps the old seed.
+export const MAX_ROUND = 4;
+export function genDay(key, level=1, round=1){
   const lvl=Math.min(MAX_LEVEL,Math.max(1,parseInt(level,10)||1));
-  const r=rng(seedOf('reef-football-g4|'+key+'|L'+lvl));
+  const rd=Math.min(MAX_ROUND,Math.max(1,parseInt(round,10)||1));
+  const r=rng(seedOf('reef-football-g4|'+key+'|L'+lvl+(rd>1?'|R'+rd:'')));
   const g={lvl,ri:(a,b)=>a+Math.floor(r()*(b-a+1)),pick:arr=>arr[Math.floor(r()*arr.length)]};
   const shuffle=arr=>{const c=arr.slice();for(let i=c.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[c[i],c[j]]=[c[j],c[i]]}return c};
   // every day: a fraction, the multiplication table kind (mul1), a bigger multiplication (mul2), a geometry
