@@ -46,7 +46,7 @@ function fracOf(g,p){
     ()=>`באימון של ${P(p)} היו ${N(T)} כדורים. ${fr} מהכדורים היו צהובים. כמה כדורים צהובים היו באימון?`,
     ()=>`בלה מאסיה, בית הספר לכדורגל של ברצלונה, מתאמנים ${N(T)} ילדים. ${fr} מהם בני 10. כמה ילדים בני 10 מתאמנים שם?`
   ])();
-  return {cat:'שברים',html,answer:part,ans:N(part),
+  return {cat:'שברים',html,answer:part,ans:N(part),t:{kind:'fracOf',T,d,a,each:k,part},
     hint:`קודם מחלקים את ${N(T)} ל-${N(d)} חלקים שווים: ${X(`${T} ÷ ${d} = ${k}`)}. `+(a>1?`ואז לוקחים ${N(a)} חלקים: ${X(`${k} × ${a}`)}.`:`לוקחים חלק אחד, אז זו התשובה.`)};
 }
 function fracAdd(g,p){
@@ -56,7 +56,7 @@ function fracAdd(g,p){
     ()=>`ביום ראשון ${NAME} צבע ${F(a,d)} מהציור של ${P(p)}, וביום שני עוד ${F(b,d)} מהציור. איזה חלק מהציור הוא צבע בסך הכול?`,
     ()=>`האוהדים של ברצלונה מילאו ${F(a,d)} מהיציע בשעה הראשונה, ועוד ${F(b,d)} מהיציע בשעה השנייה. איזה חלק מהיציע התמלא?`
   ])();
-  return {cat:'שברים',html,answer:s/d,ans:F(s,d),
+  return {cat:'שברים',html,answer:s/d,ans:F(s,d),t:{kind:'fracAdd',a,b,d,s},
     hint:`כשהמכנים שווים, מחברים רק את המונים: ${X(`${a} + ${b} = ${s}`)}, והמכנה נשאר ${N(d)}. כותבים שבר עם הכפתור ⁄.`};
 }
 function fracSub(g,p){
@@ -66,7 +66,7 @@ function fracSub(g,p){
     ()=>`${F(a,d)} מהכרטיסים למשחק של ברצלונה כבר נמכרו. איזה חלק מהכרטיסים עוד לא נמכר?`,
     ()=>`${NAME} כבר הדביק ${F(a,d)} מהמדבקות באלבום של ברצלונה. איזה חלק מהאלבום עוד ריק?`
   ])();
-  return {cat:'שברים',html,answer:(d-a)/d,ans:F(d-a,d),
+  return {cat:'שברים',html,answer:(d-a)/d,ans:F(d-a,d),t:{kind:'fracSub',a,d},
     hint:`השלם הוא ${F(d,d)}. מחסרים את המונים: ${X(`${d} − ${a} = ${d-a}`)}, והמכנה נשאר ${N(d)}. כותבים שבר עם הכפתור ⁄.`};
 }
 function fracRemain(g,p){
@@ -76,7 +76,7 @@ function fracRemain(g,p){
     ()=>`ל${NAME} היו ${N(T)} מדבקות של שחקני ברצלונה. הוא נתן לחבר ${F(a,d)} מהמדבקות. כמה מדבקות נשארו לו?`,
     ()=>`בלה מאסיה יש ${N(T)} ילדים. ${F(a,d)} מהם שוערים, וכל השאר שחקני שדה. כמה שחקני שדה יש?`
   ])();
-  return {cat:'שברים',html,answer:T-part,ans:N(T-part),
+  return {cat:'שברים',html,answer:T-part,ans:N(T-part),t:{kind:'fracRemain',T,d,a,each:k,part},
     hint:`שני שלבים. קודם מוצאים ${F(a,d)} מ-${N(T)}: ${X(`${T} ÷ ${d} × ${a} = ${part}`)}. ואז מחסרים: ${X(`${T} − ${part}`)}.`};
 }
 
@@ -109,7 +109,7 @@ function mulStory(g,p,a,b){
     ()=>`בחנות של ברצלונה מוכרים ${N(a)} חולצות של ${P(p)} בכל יום. כמה חולצות נמכרו ב-${N(b)} ימים?`
   ];
   const html=g.pick(a<=10?small:a<100?medium:big)();
-  return {cat:'כפל',html,answer:a*b,ans:N(a*b),hint:mulHint(a,b)};
+  return {cat:'כפל',html,answer:a*b,ans:N(a*b),hint:mulHint(a,b),t:{kind:'mul',a,b}};
 }
 function mulHint(a,b){
   if(a<=10&&b<=10) return `זה מלוח הכפל: ${X(`${a} × ${b}`)}. אם לא זוכרים, מתחילים ממשהו שזוכרים, כמו ${X(`${a} × 5 = ${a*5}`)}, ומוסיפים או מורידים ${N(a)} כל פעם.`;
@@ -152,7 +152,7 @@ function area(g,p){
     ()=>`מגרש אימון קטן של ברצלונה בצורת מלבן, באורך ${N(w)} מטר וברוחב ${N(h)} מטר. מה השטח של המגרש במטרים רבועים?`,
     ()=>`פוסטר של ${P(p)} בצורת מלבן, באורך ${N(w)} סנטימטר וברוחב ${N(h)} סנטימטר. מה השטח של הפוסטר בסנטימטרים רבועים?`
   ])();
-  return {cat:'הנדסה · שטח',html,answer:w*h,ans:N(w*h),fig:figRect(w,h),hint:`שטח של מלבן = אורך × רוחב. `+mulHint(w,h)};
+  return {cat:'הנדסה · שטח',html,answer:w*h,ans:N(w*h),fig:figRect(w,h),t:{kind:'area',w,h},hint:`שטח של מלבן = אורך × רוחב. `+mulHint(w,h)};
 }
 
 /* ---------- geometry (הנדסה), grade 4: rectangle & square, triangles, boxes, polygons ---------- */
@@ -183,53 +183,53 @@ function rectPerim(g,p){
     ()=>`${P(p)} רץ סיבוב אחד מסביב למגרש אימון בצורת מלבן, באורך ${N(w)} מטר וברוחב ${N(h)} מטר. כמה מטרים הוא רץ?`,
     ()=>`${NAME} רוצה לצבוע קו לבן מסביב למגרש קטן בצורת מלבן, באורך ${N(w)} מטר וברוחב ${N(h)} מטר. כמה מטרים של קו הוא צריך לצבוע?`
   ])();
-  return {cat:'הנדסה · היקף',html,answer:2*(w+h),ans:N(2*(w+h)),fig:figRect(w,h),
+  return {cat:'הנדסה · היקף',html,answer:2*(w+h),ans:N(2*(w+h)),fig:figRect(w,h),t:{kind:'perim',w,h},
     hint:`היקף זה סכום כל ארבע הצלעות: ${X(`${w} + ${h} + ${w} + ${h}`)}. או: ${X(`(${w} + ${h}) × 2`)}.`};
 }
 function square(g,p){
   const L=g.lvl, s=L===1?g.ri(3,10):g.ri(6,25), v=g.ri(0,2);
-  if(v===0) return {cat:'הנדסה · ריבוע',html:`בחדר הכושר של ברצלונה יש מזרן בצורת ריבוע, וכל צלע שלו ${N(s)} מטר. מה ההיקף של המזרן?`,answer:4*s,ans:N(4*s),fig:figSquare(s),
+  if(v===0) return {cat:'הנדסה · ריבוע',html:`בחדר הכושר של ברצלונה יש מזרן בצורת ריבוע, וכל צלע שלו ${N(s)} מטר. מה ההיקף של המזרן?`,answer:4*s,ans:N(4*s),fig:figSquare(s),t:{kind:'sqPerim',s},
     hint:`בריבוע כל 4 הצלעות שוות. ההיקף: ${X(`${s} × 4`)}.`};
-  if(v===1) return {cat:'הנדסה · ריבוע',html:`${P(p)} רץ מסביב לריבוע שסימן המאמן על הדשא. ההיקף של הריבוע ${N(4*s)} מטר. מה האורך של כל צלע?`,answer:s,ans:N(s),fig:figSquare('?'),
+  if(v===1) return {cat:'הנדסה · ריבוע',html:`${P(p)} רץ מסביב לריבוע שסימן המאמן על הדשא. ההיקף של הריבוע ${N(4*s)} מטר. מה האורך של כל צלע?`,answer:s,ans:N(s),fig:figSquare('?'),t:{kind:'sqSide',s},
     hint:`בריבוע יש 4 צלעות שוות, אז מחלקים את ההיקף ל-4: ${X(`${4*s} ÷ 4`)}.`};
-  return {cat:'הנדסה · ריבוע',html:`על הדשא סימנו ריבוע לתרגיל מסירות, וכל צלע שלו ${N(s)} מטר. מה השטח של הריבוע במטרים רבועים?`,answer:s*s,ans:N(s*s),fig:figSquare(s),
+  return {cat:'הנדסה · ריבוע',html:`על הדשא סימנו ריבוע לתרגיל מסירות, וכל צלע שלו ${N(s)} מטר. מה השטח של הריבוע במטרים רבועים?`,answer:s*s,ans:N(s*s),fig:figSquare(s),t:{kind:'sqArea',s},
     hint:`שטח של ריבוע = צלע × צלע: ${X(`${s} × ${s}`)}.`};
 }
 function missingSide(g,p){
   const L=g.lvl, w=L===1?g.ri(3,10):g.ri(6,12), h=L===1?g.ri(2,9):g.ri(4,15), A=w*h;
-  return {cat:'הנדסה · שטח',html:`השטח של מגרש מיני בצורת מלבן הוא ${N(A)} מטרים רבועים. האורך שלו ${N(w)} מטר. מה הרוחב שלו?`,answer:h,ans:N(h),fig:figRect(w,h,w,'?'),
+  return {cat:'הנדסה · שטח',html:`השטח של מגרש מיני בצורת מלבן הוא ${N(A)} מטרים רבועים. האורך שלו ${N(w)} מטר. מה הרוחב שלו?`,answer:h,ans:N(h),fig:figRect(w,h,w,'?'),t:{kind:'missingSide',w,h,A},
     hint:`שטח = אורך × רוחב, אז שואלים: ${N(w)} כפול כמה זה ${N(A)}? כלומר ${X(`${A} ÷ ${w}`)}.`};
 }
 function triangle(g,p){
   const v=g.easy?g.pick([0,2]):g.ri(0,2), s=g.easy?g.ri(2,10):g.ri(3,15), b=g.ri(3,g.easy?9:12);
-  if(v===0) return {cat:'הנדסה · משולש',html:`דגלון פינה בצורת משולש שווה צלעות. כל צלע ${N(s)} סנטימטר. מה ההיקף של הדגלון?`,answer:3*s,ans:N(3*s),fig:figTri(s,s,s),
+  if(v===0) return {cat:'הנדסה · משולש',html:`דגלון פינה בצורת משולש שווה צלעות. כל צלע ${N(s)} סנטימטר. מה ההיקף של הדגלון?`,answer:3*s,ans:N(3*s),fig:figTri(s,s,s),t:{kind:'triEq',s},
     hint:`במשולש שווה צלעות כל 3 הצלעות שוות: ${X(`${s} × 3`)}.`};
-  if(v===1) return {cat:'הנדסה · משולש',html:`למשולש שווה צלעות יש היקף של ${N(3*s)} סנטימטר. מה האורך של כל צלע?`,answer:s,ans:N(s),fig:figTri('?','?','?'),
+  if(v===1) return {cat:'הנדסה · משולש',html:`למשולש שווה צלעות יש היקף של ${N(3*s)} סנטימטר. מה האורך של כל צלע?`,answer:s,ans:N(s),fig:figTri('?','?','?'),t:{kind:'triSide',s},
     hint:`3 צלעות שוות, אז מחלקים את ההיקף ל-3: ${X(`${3*s} ÷ 3`)}.`};
-  return {cat:'הנדסה · משולש',html:`${P(p)} צייר משולש שווה שוקיים. כל שוק ${N(s)} סנטימטר, והבסיס ${N(b)} סנטימטר. מה ההיקף של המשולש?`,answer:2*s+b,ans:N(2*s+b),fig:figTri(b,s,s),
+  return {cat:'הנדסה · משולש',html:`${P(p)} צייר משולש שווה שוקיים. כל שוק ${N(s)} סנטימטר, והבסיס ${N(b)} סנטימטר. מה ההיקף של המשולש?`,answer:2*s+b,ans:N(2*s+b),fig:figTri(b,s,s),t:{kind:'triIso',s,b},
     hint:`במשולש שווה שוקיים שתי השוקיים שוות: ${X(`${s} + ${s} + ${b}`)}.`};
 }
 function box(g,p){
   const L=g.lvl, v=g.easy?0:g.ri(0,2);   // easy: only how many faces / edges / vertices
   if(v===0){const n=g.ri(2,L===1?5:9), part=g.pick([['פאות',6,'פאה'],['מקצועות',12,'מקצוע'],['קודקודים',8,'קודקוד']]);
-    return {cat:'הנדסה · תיבה',html:`הנעליים החדשות של ${P(p)} הגיעו בקופסה בצורת תיבה. במחסן יש ${N(n)} קופסאות כאלה. כמה ${part[0]} יש לכל הקופסאות ביחד?`,answer:n*part[1],ans:N(n*part[1]),fig:figBox('','',''),
+    return {cat:'הנדסה · תיבה',html:`הנעליים החדשות של ${P(p)} הגיעו בקופסה בצורת תיבה. במחסן יש ${N(n)} קופסאות כאלה. כמה ${part[0]} יש לכל הקופסאות ביחד?`,answer:n*part[1],ans:N(n*part[1]),fig:figBox('','',''),t:{kind:'boxCount',n,per:part[1],name:part[0],one:part[2]},
       hint:`לכל תיבה יש ${N(6)} פאות, ${N(12)} מקצועות ו-${N(8)} קודקודים. לקופסה אחת יש ${N(part[1])} ${part[0]}, אז: ${X(`${part[1]} × ${n}`)}.`};}
   const a=g.ri(2,L===1?5:8), b=g.ri(2,L===1?4:6), c=g.ri(2,L===1?3:5);
-  if(v===1) return {cat:'הנדסה · נפח',html:`ארגז כדורים בצורת תיבה מלא בקוביות קטנות. לאורך יש ${N(a)} קוביות, לרוחב ${N(b)} קוביות ולגובה ${N(c)} קוביות. כמה קוביות יש בארגז?`,answer:a*b*c,ans:N(a*b*c),fig:figBox(a,b,c),
+  if(v===1) return {cat:'הנדסה · נפח',html:`ארגז כדורים בצורת תיבה מלא בקוביות קטנות. לאורך יש ${N(a)} קוביות, לרוחב ${N(b)} קוביות ולגובה ${N(c)} קוביות. כמה קוביות יש בארגז?`,answer:a*b*c,ans:N(a*b*c),fig:figBox(a,b,c),t:{kind:'boxVol',a,b,c},
     hint:`בשכבה אחת יש ${X(`${a} × ${b} = ${a*b}`)} קוביות. יש ${N(c)} שכבות: ${X(`${a*b} × ${c}`)}.`};
-  return {cat:'הנדסה · תיבה',html:`ל${NAME} יש קופסה בצורת תיבה לאוסף המדבקות. האורך שלה ${N(a)} סנטימטר, הרוחב ${N(b)} סנטימטר והגובה ${N(c)} סנטימטר. מה הסכום של האורכים של כל 12 המקצועות?`,answer:4*(a+b+c),ans:N(4*(a+b+c)),fig:figBox(a,b,c),
+  return {cat:'הנדסה · תיבה',html:`ל${NAME} יש קופסה בצורת תיבה לאוסף המדבקות. האורך שלה ${N(a)} סנטימטר, הרוחב ${N(b)} סנטימטר והגובה ${N(c)} סנטימטר. מה הסכום של האורכים של כל 12 המקצועות?`,answer:4*(a+b+c),ans:N(4*(a+b+c)),fig:figBox(a,b,c),t:{kind:'boxEdges',a,b,c},
     hint:`בתיבה יש 4 מקצועות לאורך, 4 לרוחב ו-4 לגובה: ${X(`(${a} + ${b} + ${c}) × 4`)}.`};
 }
 function polygons(g,p){
   const v=g.ri(0,2);
   if(v===0){const n=g.ri(2,9);
-    return {cat:'הנדסה · מצולעים',html:`על כדור הכדורגל הקלאסי יש מחומשים שחורים ומשושים לבנים. כמה צלעות יש בסך הכול ל-${N(n)} משושים?`,answer:6*n,ans:N(6*n),
+    return {cat:'הנדסה · מצולעים',html:`על כדור הכדורגל הקלאסי יש מחומשים שחורים ומשושים לבנים. כמה צלעות יש בסך הכול ל-${N(n)} משושים?`,answer:6*n,ans:N(6*n),t:{kind:'poly',n,per:6,one:'משושה',what:'צלעות'},
       hint:`למשושה יש ${N(6)} צלעות: ${X(`6 × ${n}`)}.`};}
   if(v===1){const n=g.ri(2,12);
-    return {cat:'הנדסה · מצולעים',html:`${NAME} צייר ${N(n)} מחומשים, כמו הכתמים השחורים על כדור כדורגל. כמה צלעות יש לכל המחומשים ביחד?`,answer:5*n,ans:N(5*n),
+    return {cat:'הנדסה · מצולעים',html:`${NAME} צייר ${N(n)} מחומשים, כמו הכתמים השחורים על כדור כדורגל. כמה צלעות יש לכל המחומשים ביחד?`,answer:5*n,ans:N(5*n),t:{kind:'poly',n,per:5,one:'מחומש',what:'צלעות'},
       hint:`למחומש יש ${N(5)} צלעות: ${X(`5 × ${n}`)}.`};}
   const n=g.ri(2,9);
-  return {cat:'הנדסה · מלבן',html:`על הדשא סימנו ${N(n)} מגרשים קטנים בצורת מלבן. כמה זוויות ישרות יש בכל המלבנים ביחד?`,answer:4*n,ans:N(4*n),fig:figRect(3,2,'',''),
+  return {cat:'הנדסה · מלבן',html:`על הדשא סימנו ${N(n)} מגרשים קטנים בצורת מלבן. כמה זוויות ישרות יש בכל המלבנים ביחד?`,answer:4*n,ans:N(4*n),fig:figRect(3,2,'',''),t:{kind:'poly',n,per:4,one:'מלבן',what:'זוויות ישרות'},
     hint:`לכל מלבן יש ${N(4)} זוויות ישרות: ${X(`4 × ${n}`)}.`};
 }
 
@@ -246,35 +246,205 @@ function div(g,p){
   ])();
   const hint=q<=10?`${X(`${T} ÷ ${k}`)}. שואלים: איזה מספר כפול ${N(k)} נותן ${N(T)}? זה מלוח הכפל.`
                   :`${X(`${T} ÷ ${k}`)}. שואלים: איזה מספר כפול ${N(k)} נותן ${N(T)}? אפשר להתחיל מ-${X(`10 × ${k} = ${10*k}`)}.`;
-  return {cat:'חילוק',html,answer:q,ans:N(q),hint};
+  return {cat:'חילוק',html,answer:q,ans:N(q),hint,t:{kind:'div',T,k,q}};
 }
 function multiStep(g,p){
   const L=g.lvl, v=g.ri(0,2);
   if(v===0){const n=g.ri(2,5),pr=L===1?g.ri(3,10):L===2?g.ri(11,25):g.ri(15,35),c=n*pr,pay=c<50?50:c<100?100:200;
-    return {cat:'שני שלבים',html:`${NAME} קנה ${N(n)} כרטיסים למשחק של הפועל באר שבע, כל כרטיס ב-${N(pr)} ₪. הוא שילם בשטר של ${N(pay)} ₪. כמה עודף הוא קיבל?`,answer:pay-c,ans:N(pay-c),
+    return {cat:'שני שלבים',html:`${NAME} קנה ${N(n)} כרטיסים למשחק של הפועל באר שבע, כל כרטיס ב-${N(pr)} ₪. הוא שילם בשטר של ${N(pay)} ₪. כמה עודף הוא קיבל?`,answer:pay-c,ans:N(pay-c),t:{kind:'change',n,pr,c,pay},
       hint:`קודם מחשבים כמה עלו הכרטיסים: ${X(`${n} × ${pr} = ${c}`)}. ואז מחסרים: ${X(`${pay} − ${c}`)}.`};}
   if(v===1){const S=g.ri(120,600)*10,n=g.ri(3,8),m=L===1?g.ri(2,5)*10:L===2?g.ri(12,30):g.ri(42,58);
-    return {cat:'שני שלבים',html:`באצטדיון ישבו ${N(S)} אוהדים. הגיעו עוד ${N(n)} אוטובוסים, ובכל אוטובוס ${N(m)} אוהדים. כמה אוהדים יש עכשיו באצטדיון?`,answer:S+n*m,ans:N(S+n*m),
+    return {cat:'שני שלבים',html:`באצטדיון ישבו ${N(S)} אוהדים. הגיעו עוד ${N(n)} אוטובוסים, ובכל אוטובוס ${N(m)} אוהדים. כמה אוהדים יש עכשיו באצטדיון?`,answer:S+n*m,ans:N(S+n*m),t:{kind:'fans',S,n,m},
       hint:`קודם מחשבים כמה אוהדים הגיעו באוטובוסים: ${X(`${n} × ${m} = ${n*m}`)}. ואז מחברים: ${X(`${S} + ${n*m}`)}.`};}
   const s=L===1?g.ri(4,10):L===2?g.ri(10,20):g.ri(10,30),n=g.ri(4,9),c=g.ri(Math.max(5,Math.floor(s*n/4)),s*n-3);
-  return {cat:'שני שלבים',html:`${NAME} חוסך ${N(s)} ₪ בכל שבוע. אחרי ${N(n)} שבועות הוא קנה חולצה של ${P(p)} ב-${N(c)} ₪. כמה כסף נשאר לו?`,answer:s*n-c,ans:N(s*n-c),
+  return {cat:'שני שלבים',html:`${NAME} חוסך ${N(s)} ₪ בכל שבוע. אחרי ${N(n)} שבועות הוא קנה חולצה של ${P(p)} ב-${N(c)} ₪. כמה כסף נשאר לו?`,answer:s*n-c,ans:N(s*n-c),t:{kind:'save',s,n,c},
     hint:`קודם מחשבים כמה הוא חסך: ${X(`${s} × ${n} = ${s*n}`)}. ואז מחסרים: ${X(`${s*n} − ${c}`)}.`};
 }
 function time(g,p){
   const v=g.ri(0,2);
   if(v===0){const m=g.ri(12,64);
-    return {cat:'זמן',html:`משחק כדורגל נמשך ${N(90)} דקות. ${P(p)} נכנס כמחליף ושיחק ${N(m)} דקות עד הסוף. כמה דקות הוא ישב על הספסל?`,answer:90-m,ans:N(90-m),
+    return {cat:'זמן',html:`משחק כדורגל נמשך ${N(90)} דקות. ${P(p)} נכנס כמחליף ושיחק ${N(m)} דקות עד הסוף. כמה דקות הוא ישב על הספסל?`,answer:90-m,ans:N(90-m),t:{kind:'bench',m},
       hint:`מחסרים מכל המשחק את הזמן ששיחק: ${X(`90 − ${m}`)}.`};}
   if(v===1){const n=g.easy?g.ri(2,4):g.ri(3,8);
-    return {cat:'זמן',html:`החודש ברצלונה שיחקה ${N(n)} משחקים, וכל משחק נמשך ${N(90)} דקות. כמה דקות כדורגל היא שיחקה החודש?`,answer:90*n,ans:N(90*n),
+    return {cat:'זמן',html:`החודש ברצלונה שיחקה ${N(n)} משחקים, וכל משחק נמשך ${N(90)} דקות. כמה דקות כדורגל היא שיחקה החודש?`,answer:90*n,ans:N(90*n),t:{kind:'games',n},
       hint:`${X(`90 × ${n}`)}. טיפ: ${X(`9 × ${n} = ${9*n}`)}, ומוסיפים אפס.`};}
   const h=g.ri(1,3), m=g.pick([10,15,20,25,30,40,45,50]);
-  return {cat:'זמן',html:`${P(p)} התאמן ${hours(h)} ו-${N(m)} דקות. כמה דקות הוא התאמן בסך הכול?`,answer:h*60+m,ans:N(h*60+m),
+  return {cat:'זמן',html:`${P(p)} התאמן ${hours(h)} ו-${N(m)} דקות. כמה דקות הוא התאמן בסך הכול?`,answer:h*60+m,ans:N(h*60+m),t:{kind:'hm',h,m},
     hint:`בכל שעה יש ${N(60)} דקות: ${X(`${h} × 60 = ${h*60}`)}. ועכשיו מוסיפים עוד ${N(m)} דקות.`};
 }
+/* ---------- teaching (Zion 16.11.26: "שהוא גם ילמד ולא רק ינסה לפתור"): every question gets
+   pic   = a drawing of ITS numbers (+ a short caption), opened with a button, never costs points
+   steps = solving it together, one small question at a time (after a miss); the last step = the answer
+   and genTwin() = a twin question of the same kind with other numbers (after a miss), worth TWIN_BONUS.
+   Built only from the numbers already chosen (q.t): no new random draws, so the questions stay the same. */
+const PIC = (h, body) => `<svg class="pic" viewBox="0 0 300 ${h}" role="img" aria-hidden="true" font-family="Fredoka, Rubik, sans-serif" font-weight="600">${body}</svg>`;
+const TX = (x,y,t,size=18,fill='var(--night)',anchor='middle') => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" fill="${fill}" direction="ltr">${t}</text>`;
+const DOT = (x,y,r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="var(--night)" stroke-width="1.6"/>`;
+// a bar cut into d equal parts; marks colour the first parts in order; top = the whole amount
+function picBar(d, marks, top){
+  const W=270, x0=15, y0=top?36:8, cw=W/d, H=46;
+  let body=top?TX(150,20,top,20,'var(--blau)')+`<path d="M${x0} 31 v-6 H${x0+W} v6" fill="none" stroke="var(--blau)" stroke-width="2"/>`:'';
+  let i=0;
+  for(const m of marks) for(let j=0;j<m.n;j++,i++) body+=`<rect x="${x0+i*cw}" y="${y0}" width="${cw}" height="${H}" fill="${m.fill}"/>`;
+  for(let j=0;j<d;j++) body+=`<rect x="${x0+j*cw}" y="${y0}" width="${cw}" height="${H}" fill="none" stroke="var(--night)" stroke-width="2"/>`;
+  return PIC(y0+H+8,body);
+}
+function picDots(a,b){   // b rows of a balls (the times table)
+  const s=Math.min(24,250/a), r=s*0.36, rowH=s+6, x0=150-a*s/2;
+  let body='';
+  for(let i=0;i<b;i++){const y=6+i*rowH;
+    body+=`<rect x="${x0-6}" y="${y}" width="${a*s+12}" height="${s}" rx="${s/2}" fill="var(--pitch)" opacity=".2"/>`;
+    for(let j=0;j<a;j++) body+=DOT(x0+s/2+j*s,y+s/2,r);}
+  return PIC(b*rowH+8,body);
+}
+function picBoxes(a,b){  // b boxes with a in each
+  const per=Math.min(b,5), rows=Math.ceil(b/5), bw=52, gap=6, x0=150-(per*bw+(per-1)*gap)/2;
+  let body='';
+  for(let i=0;i<b;i++){const x=x0+(i%5)*(bw+gap), y=6+Math.floor(i/5)*58;
+    body+=`<rect x="${x}" y="${y}" width="${bw}" height="48" rx="10" fill="var(--gold)" stroke="var(--night)" stroke-width="2"/>`+TX(x+bw/2,y+31,a,a>=100?16:19);}
+  return PIC(rows*58+6,body);
+}
+function picSplit(parts, side){   // a rectangle cut into parts (how we break a number apart)
+  const W=225, x0=60, y0=32, H=80, tot=parts.reduce((s,x)=>s+x,0);
+  let ws=parts.map(p=>Math.max(60,W*p/tot)); const k=W/ws.reduce((s,x)=>s+x,0); ws=ws.map(w=>w*k);
+  let x=x0, body=TX(x0-10,y0+H/2+7,side,20,'var(--blau)','end');
+  parts.forEach((p,i)=>{const w=ws[i];
+    body+=`<rect x="${x}" y="${y0}" width="${w}" height="${H}" fill="${i?'#9DBCEB':'var(--gold)'}" stroke="var(--night)" stroke-width="2"/>`+TX(x+w/2,y0-9,p,20,'var(--blau)')+TX(x+w/2,y0+H/2+8,'?',24);
+    x+=w;});
+  return PIC(y0+H+8,body);
+}
+function picGrid(w,h){   // w x h unit squares
+  const c=Math.min(26,250/w,180/h), x0=150-w*c/2+8, y0=6;
+  let body='';
+  for(let i=0;i<h;i++) for(let j=0;j<w;j++) body+=`<rect x="${x0+j*c}" y="${y0+i*c}" width="${c}" height="${c}" fill="${(i+j)%2?'var(--pitch)':'var(--pitch-2)'}" stroke="#fff" stroke-width="1.5"/>`;
+  body+=TX(x0+w*c/2,y0+h*c+22,w,18,'var(--blau)')+TX(x0-8,y0+h*c/2+6,h,18,'var(--blau)','end');
+  return PIC(y0+h*c+30,body);
+}
+function picRow(w,A){    // one row of w squares; how many rows make A?
+  const c=Math.min(26,250/w), x0=150-w*c/2+8, y0=6;
+  let body='';
+  for(let j=0;j<w;j++) body+=`<rect x="${x0+j*c}" y="${y0}" width="${c}" height="${c}" fill="var(--pitch)" stroke="#fff" stroke-width="1.5"/>`;
+  body+=`<rect x="${x0}" y="${y0}" width="${w*c}" height="${c*4}" fill="none" stroke="var(--night)" stroke-width="2" stroke-dasharray="6 5"/>`+
+        TX(x0+w*c/2,y0+c*2.9,A,22)+TX(x0-8,y0+c*2+7,'?',22,'var(--blau)','end')+TX(x0+w*c/2,y0+c*4+22,w,18,'var(--blau)');
+  return PIC(y0+c*4+30,body);
+}
+function picPerim(w,h){  // a rectangle with all four sides written
+  return PIC(170,`<rect x="60" y="28" width="180" height="104" rx="3" fill="var(--pitch)" stroke="var(--night)" stroke-width="2"/>`+
+    TX(150,20,w,20,'var(--blau)')+TX(150,156,w,20,'var(--blau)')+TX(50,87,h,20,'var(--blau)','end')+TX(250,87,h,20,'var(--blau)','start'));
+}
+function picShare(T,k,q){   // T shared equally into k groups
+  const per=Math.min(k,4), rows=Math.ceil(k/4), bw=64, gap=8, bh=q<=12?Math.ceil(q/4)*13+10:44, x0=150-(per*bw+(per-1)*gap)/2;
+  let body='';
+  for(let i=0;i<k;i++){const x=x0+(i%4)*(bw+gap), y=6+Math.floor(i/4)*(bh+8);
+    body+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="10" fill="#fff" stroke="var(--night)" stroke-width="2"/>`;
+    if(q<=12) for(let j=0;j<q;j++) body+=DOT(x+11+(j%4)*14,y+11+Math.floor(j/4)*13,5);
+    else body+=TX(x+bw/2,y+bh/2+8,'?',22);}
+  return PIC(6+rows*(bh+8),body);
+}
+function picPoly(per,n){   // n hexagons / pentagons / rectangles
+  const cols=Math.min(n,6), rows=Math.ceil(n/6), sz=40, gap=8, x0=150-(cols*sz+(cols-1)*gap)/2;
+  let body='';
+  for(let i=0;i<n;i++){const cx=x0+(i%6)*(sz+gap)+sz/2, cy=6+Math.floor(i/6)*(sz+gap)+sz/2;
+    if(per===4) body+=`<rect x="${cx-18}" y="${cy-12}" width="36" height="24" fill="var(--pitch)" stroke="var(--night)" stroke-width="2"/>`;
+    else body+=`<polygon points="${Array.from({length:per},(_,j)=>{const an=-Math.PI/2+j*2*Math.PI/per;return (cx+18*Math.cos(an)).toFixed(1)+','+(cy+18*Math.sin(an)).toFixed(1)}).join(' ')}" fill="${per===5?'var(--night)':'#fff'}" stroke="var(--night)" stroke-width="2"/>`;}
+  return PIC(6+rows*(sz+gap),body);
+}
+function picTime(segs,total){   // a time bar, read right to left like Hebrew: each piece with its minutes
+  let x=285, body='';
+  for(const s of segs){const w=270*s.v/total; x-=w;
+    body+=`<rect x="${x}" y="28" width="${w}" height="34" fill="${s.fill}" stroke="var(--night)" stroke-width="2"/>`+TX(x+w/2,20,s.l,15,'var(--blau)');}
+  return PIC(70,body);
+}
+const ST = (text,a,ans) => ({text, a, ans: ans===undefined ? N(a) : ans});
+function mulTeach(a,b){
+  if(a<=10&&b<=10) return {
+    steps: b<=5 ? [ST(`כמה קבוצות יש?`,b), ST(`סופרים בקפיצות של ${N(a)}, ${N(b)} קפיצות. כמה יוצא?`,a*b)]
+                : [ST(`קודם ${X(`${a} × 5`)}`,a*5), ST(`ועוד ${X(`${a} × ${b-5}`)}`,a*(b-5)), ST(`מחברים: ${X(`${a*5} + ${a*(b-5)}`)}`,a*b)],
+    pic: picDots(a,b), cap: `${N(b)} שורות, ובכל שורה ${N(a)}. כמה ביחד?`};
+  if(b<=10&&a%10===0&&a<100) return {
+    steps: [ST(`${X(`${a/10} × ${b}`)}`,a/10*b), ST(`מוסיפים אפס בסוף: ${X(`${a} × ${b}`)}`,a*b)],
+    pic: picBoxes(a,b), cap: `${N(b)} קבוצות של ${N(a)}. כל ${N(a)} זה ${N(a/10)} עשרות.`};
+  if(b<=10){const u=a>=100?100:10, hi=a-a%u, lo=a%u;
+    if(lo) return {steps: [ST(`${X(`${hi} × ${b}`)}`,hi*b), ST(`${X(`${lo} × ${b}`)}`,lo*b), ST(`מחברים: ${X(`${hi*b} + ${lo*b}`)}`,a*b)],
+      pic: picSplit([hi,lo],b), cap: `מפרקים את ${N(a)} ל-${N(hi)} ועוד ${N(lo)}, וכופלים כל חלק ב-${N(b)}.`};
+    return {steps: [ST(`${X(`${a/u} × ${b}`)}`,a/u*b), ST(`מוסיפים ${u===100?'שני אפסים':'אפס'}: ${X(`${a} × ${b}`)}`,a*b)],
+      pic: picBoxes(a,b), cap: `${N(b)} קבוצות של ${N(a)}.`};}
+  if(b%10===0) return {steps: [ST(`${X(`${a} × ${b/10}`)}`,a*b/10), ST(`מוסיפים אפס: ${X(`${a} × ${b}`)}`,a*b)], pic:'', cap:`${X(`${a} × ${b}`)} זה כמו ${X(`${a} × ${b/10}`)} ועוד אפס בסוף.`};
+  const bt=b-b%10, bo=b%10;
+  return {steps: [ST(`${X(`${a} × ${bt}`)}`,a*bt), ST(`${X(`${a} × ${bo}`)}`,a*bo), ST(`מחברים: ${X(`${a*bt} + ${a*bo}`)}`,a*b)],
+    pic: picSplit([bt,bo],a), cap: `מפרקים את ${N(b)} ל-${N(bt)} ועוד ${N(bo)}, וכופלים כל חלק ב-${N(a)}.`};
+}
+function teach(q){
+  const t=q.t; let steps=[], pic='', cap='';
+  if(!t) return q;
+  switch(t.kind){
+    case 'fracOf': case 'fracRemain': {const {T,d,a,each,part}=t;
+      steps=[ST(`לכמה חלקים שווים מחלקים את ${N(T)}? (המספר התחתון בשבר ${F(a,d)})`,d), ST(`כמה יש בכל חלק? ${X(`${T} ÷ ${d}`)}`,each)];
+      if(a>1) steps.push(ST(`לוקחים ${N(a)} חלקים: ${X(`${each} × ${a}`)}`,part));
+      if(t.kind==='fracRemain') steps.push(ST(`כמה נשארו? ${X(`${T} − ${part}`)}`,T-part));
+      pic=picBar(d,[{n:a,fill:'var(--gold)'}],T);
+      cap=`כל הפס הוא ${N(T)}. חותכים אותו ל-${N(d)} חלקים שווים, והחלקים הצהובים הם ${F(a,d)}.`+(t.kind==='fracRemain'?' מה שלא צהוב זה מה שנשאר.':''); break;}
+    case 'fracAdd': {const {a,b,d,s}=t;
+      steps=[ST(`מה המספר התחתון (המכנה)? כשהמכנים שווים הוא לא משתנה`,d), ST(`כמה חלקים ביחד? ${X(`${a} + ${b}`)}`,s),
+             ST(`עכשיו כותבים את השבר: ${N(s)} למעלה ו-${N(d)} למטה, עם הכפתור ⁄`,s/d,F(s,d))];
+      pic=picBar(d,[{n:a,fill:'var(--gold)'},{n:b,fill:'#9DBCEB'}]);
+      cap=`הפס מחולק ל-${N(d)} חלקים. הצהוב זה ${F(a,d)} והכחול זה ${F(b,d)}. כמה חלקים צבועים?`; break;}
+    case 'fracSub': {const {a,d}=t;
+      steps=[ST(`לכמה חלקים מחולק השלם?`,d), ST(`כמה חלקים נשארו? ${X(`${d} − ${a}`)}`,d-a),
+             ST(`עכשיו כותבים את השבר: ${N(d-a)} למעלה ו-${N(d)} למטה, עם הכפתור ⁄`,(d-a)/d,F(d-a,d))];
+      pic=picBar(d,[{n:a,fill:'#C8CDD6'}]);
+      cap=`השלם מחולק ל-${N(d)} חלקים. האפור זה ${F(a,d)} שכבר נגמר. כמה חלקים לבנים נשארו?`; break;}
+    case 'mul': ({steps,pic,cap}=mulTeach(t.a,t.b)); break;
+    case 'area': {const {w,h}=t;
+      steps=[ST(`מה האורך?`,w), ST(`מה הרוחב?`,h), ST(`שטח = אורך × רוחב: ${X(`${w} × ${h}`)}`,w*h)];
+      if(w*h<=150){pic=picGrid(w,h); cap=`כל משבצת היא ריבוע של 1 על 1. יש ${N(h)} שורות, ובכל שורה ${N(w)} משבצות.`;} break;}
+    case 'perim': {const {w,h}=t;
+      steps=[ST(`חצי סיבוב: אורך ועוד רוחב ${X(`${w} + ${h}`)}`,w+h), ST(`סיבוב שלם זה פעמיים: ${X(`${w+h} × 2`)}`,2*(w+h))];
+      pic=picPerim(w,h); cap=`היקף זה כל הדרך מסביב, כל ארבע הצלעות.`; break;}
+    case 'sqPerim': steps=[ST(`כמה צלעות יש לריבוע?`,4), ST(`כל הצלעות שוות: ${X(`${t.s} × 4`)}`,4*t.s)];
+      pic=picPerim(t.s,t.s); cap='בריבוע כל 4 הצלעות שוות.'; break;
+    case 'sqSide': steps=[ST(`כמה צלעות יש לריבוע?`,4), ST(`מחלקים את ההיקף ל-4: ${X(`${4*t.s} ÷ 4`)}`,t.s)];
+      pic=picPerim('?','?'); cap=`4 צלעות שוות, וביחד הן ${N(4*t.s)}.`; break;
+    case 'sqArea': steps=[ST(`מה האורך של צלע?`,t.s), ST(`שטח = צלע × צלע: ${X(`${t.s} × ${t.s}`)}`,t.s*t.s)];
+      if(t.s<=12){pic=picGrid(t.s,t.s); cap=`ריבוע של ${N(t.s)} על ${N(t.s)} משבצות.`;} break;
+    case 'missingSide': {const {w,h,A}=t;
+      steps=[ST(`מה האורך?`,w), ST(`${N(w)} כפול כמה זה ${N(A)}? ${X(`${A} ÷ ${w}`)}`,h)];
+      if(w<=15){pic=picRow(w,A); cap=`בשורה אחת יש ${N(w)} משבצות. כמה שורות צריך כדי שיהיו ${N(A)} משבצות?`;} break;}
+    case 'triEq': steps=[ST(`כמה צלעות יש למשולש?`,3), ST(`כל הצלעות שוות: ${X(`${t.s} × 3`)}`,3*t.s)];
+      cap='במשולש שווה צלעות כל 3 הצלעות שוות.'; break;
+    case 'triSide': steps=[ST(`כמה צלעות יש למשולש?`,3), ST(`מחלקים את ההיקף ל-3: ${X(`${3*t.s} ÷ 3`)}`,t.s)];
+      cap='במשולש שווה צלעות כל 3 הצלעות שוות.'; break;
+    case 'triIso': steps=[ST(`שתי השוקיים: ${X(`${t.s} + ${t.s}`)}`,2*t.s), ST(`ועוד הבסיס: ${X(`${2*t.s} + ${t.b}`)}`,2*t.s+t.b)];
+      cap='במשולש שווה שוקיים שתי הצלעות הצדדיות (השוקיים) שוות.'; break;
+    case 'boxCount': steps=[ST(`כמה ${t.name} יש לקופסה אחת?`,t.per), ST(`יש ${N(t.n)} קופסאות: ${X(`${t.per} × ${t.n}`)}`,t.per*t.n)];
+      cap=`לכל תיבה יש ${N(6)} פאות (הצדדים), ${N(12)} מקצועות (הקווים) ו-${N(8)} קודקודים (הפינות).`; break;
+    case 'boxVol': steps=[ST(`כמה קוביות בשכבה אחת? ${X(`${t.a} × ${t.b}`)}`,t.a*t.b), ST(`כמה שכבות יש?`,t.c), ST(`${X(`${t.a*t.b} × ${t.c}`)}`,t.a*t.b*t.c)];
+      pic=picGrid(t.a,t.b); cap=`זו שכבה אחת, ${N(t.a)} על ${N(t.b)}. יש ${N(t.c)} שכבות כאלה אחת על השנייה.`; break;
+    case 'boxEdges': steps=[ST(`מקצוע אחד מכל סוג: ${X(`${t.a} + ${t.b} + ${t.c}`)}`,t.a+t.b+t.c), ST(`יש 4 מכל סוג: ${X(`${t.a+t.b+t.c} × 4`)}`,4*(t.a+t.b+t.c))];
+      cap='בתיבה יש 4 מקצועות לאורך, 4 לרוחב ו-4 לגובה.'; break;
+    case 'poly': steps=[ST(`כמה ${t.what} יש ל${t.one} אחד?`,t.per), ST(`יש ${N(t.n)}: ${X(`${t.per} × ${t.n}`)}`,t.per*t.n)];
+      pic=picPoly(t.per,t.n); cap=`כאן יש ${N(t.n)}. סופרים ${t.what} באחד, ואז כופלים.`; break;
+    case 'div': steps=[ST(`לכמה קבוצות מחלקים?`,t.k), ST(`${N(t.k)} כפול כמה זה ${N(t.T)}? ${X(`${t.T} ÷ ${t.k}`)}`,t.q)];
+      pic=picShare(t.T,t.k,t.q); cap=`מחלקים ${N(t.T)} ל-${N(t.k)} קבוצות שוות. כמה יש בכל קבוצה?`; break;
+    case 'change': steps=[ST(`כמה עלו הכרטיסים? ${X(`${t.n} × ${t.pr}`)}`,t.c), ST(`כמה עודף? ${X(`${t.pay} − ${t.c}`)}`,t.pay-t.c)]; break;
+    case 'fans': steps=[ST(`כמה אוהדים הגיעו באוטובוסים? ${X(`${t.n} × ${t.m}`)}`,t.n*t.m), ST(`ביחד עם מי שכבר ישב: ${X(`${t.S} + ${t.n*t.m}`)}`,t.S+t.n*t.m)]; break;
+    case 'save': steps=[ST(`כמה הוא חסך? ${X(`${t.s} × ${t.n}`)}`,t.s*t.n), ST(`כמה נשאר אחרי הקנייה? ${X(`${t.s*t.n} − ${t.c}`)}`,t.s*t.n-t.c)]; break;
+    case 'bench': steps=[ST(`כמה דקות נמשך משחק שלם?`,90), ST(`פחות הזמן ששיחק: ${X(`90 − ${t.m}`)}`,90-t.m)];
+      pic=picTime([{v:90-t.m,l:'?',fill:'#C8CDD6'},{v:t.m,l:t.m,fill:'var(--pitch)'}],90);
+      cap=`כל הפס הוא משחק של ${N(90)} דקות. הירוק זה הזמן שהוא שיחק, והאפור זה הספסל.`; break;
+    case 'games': steps=[ST(`טיפ: קודם ${X(`9 × ${t.n}`)}`,9*t.n), ST(`ומוסיפים אפס: ${X(`90 × ${t.n}`)}`,90*t.n)];
+      pic=picTime(Array.from({length:t.n},()=>({v:90,l:90,fill:'var(--pitch)'})),90*t.n); cap=`${N(t.n)} משחקים, כל אחד ${N(90)} דקות.`; break;
+    case 'hm': steps=[ST(`כמה דקות יש ב${hours(t.h)}? ${X(`${t.h} × 60`)}`,60*t.h), ST(`ועוד ${N(t.m)} דקות: ${X(`${60*t.h} + ${t.m}`)}`,60*t.h+t.m)];
+      pic=picTime([...Array.from({length:t.h},()=>({v:60,l:60,fill:'var(--pitch)'})),{v:t.m,l:t.m,fill:'var(--gold)'}],60*t.h+t.m); cap=`כל שעה היא ${N(60)} דקות.`; break;
+  }
+  q.steps=steps;
+  q.pic=pic||cap?`<div class="picwrap">${pic}${cap?`<p class="piccap">${cap}</p>`:''}</div>`:'';
+  return q;
+}
+
 // round 2+ = a retry ("אימון חוזר", Zion 16.11.26): 5 new questions, same day and level. Round 1 keeps the old seed.
 export const MAX_ROUND = 4;
-export function genDay(key, level=1, round=1){
+function build(key, level=1, round=1){
   const lvl=Math.min(MAX_LEVEL,Math.max(1,parseInt(level,10)||1));
   const rd=Math.min(MAX_ROUND,Math.max(1,parseInt(round,10)||1));
   const r=rng(seedOf('reef-football-g4|'+key+'|L'+lvl+(rd>1?'|R'+rd:'')));
@@ -290,12 +460,27 @@ export function genDay(key, level=1, round=1){
   const geo=g.pick(easy?[area,rectPerim,square,triangle,box,polygons]:[area,rectPerim,square,missingSide,triangle,box,box,polygons]);
   const extra=g.pick(easy?[fr[1],div,time]:[fr[1],fr[1],div,multiStep,time]);
   const used=new Set();
-  return shuffle([fr[0],mul1,mul2,geo,extra]).map(f=>{
+  const items=shuffle([fr[0],mul1,mul2,geo,extra]).map(f=>{
     // a different player for each question when possible
     let p; for(let t=0;t<6;t++){p=g.pick(f===fracOf||f===mul1?BARCA:PICKS); if(!used.has(p)) break}
     used.add(p);
-    const q=f(g,p); q.player=p; return q;
+    const q=f(g,p); q.player=p; return {q,f,p};
   });
+  return {lvl,rd,easy,items};
+}
+export function genDay(key, level=1, round=1){ return build(key,level,round).items.map(x=>teach(x.q)); }
+// the twin of question i (תרגיל תאום): the same kind of question with other numbers, after he missed it
+export function genTwin(key, level=1, round=1, i=0){
+  const b=build(key,level,round), it=b.items[i];
+  if(!it) return null;
+  let q;
+  for(let t=0;t<8;t++){
+    const r=rng(seedOf('reef-twin|'+key+'|L'+b.lvl+'|R'+b.rd+'|'+i+'|'+t));
+    const g={lvl:b.lvl,easy:b.easy,ri:(a,c)=>a+Math.floor(r()*(c-a+1)),pick:arr=>arr[Math.floor(r()*arr.length)]};
+    q=it.f(g,it.p); q.player=it.p;
+    if(q.answer!==it.q.answer) break;
+  }
+  return teach(q);
 }
 
 export function parseAnswer(s){
@@ -305,7 +490,9 @@ export function parseAnswer(s){
   return +s;
 }
 export function isRight(given,answer){const v=parseAnswer(given);return isFinite(v)&&Math.abs(v-answer)<1e-9}
-export function pointsFor(r){return r&&r.ok?(r.tries===1?POINTS_FIRST:POINTS_SECOND):0}
+// + TWIN_BONUS when he missed the question but then solved its twin
+export const TWIN_BONUS = 3;
+export function pointsFor(r){if(!r) return 0; return (r.ok?(r.tries===1?POINTS_FIRST:POINTS_SECOND):0)+(!r.ok&&r.twinOk?TWIN_BONUS:0)}
 
 // level in force on a date: levels = [{from:'YYYY-MM-DD', level}], sorted by from
 export function levelFor(date, levels){

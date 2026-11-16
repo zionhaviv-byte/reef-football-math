@@ -89,6 +89,19 @@ main .inner{padding-block:18px 28px;display:flex;flex-direction:column;gap:16px}
 .fb .goal{font-family:var(--display);font-weight:700;font-size:28px;display:block;line-height:1}
 .hint{background:var(--hint);border-radius:14px;padding:12px 14px;font-size:16px;line-height:1.7}
 .hint b{font-family:var(--display);display:block}
+/* learning: drawing, solving together, twin (16.11.26) */
+.picbtn{align-self:flex-start;background:var(--card);border:2px solid var(--blau);color:var(--blau);border-radius:999px;padding:6px 16px;font-family:var(--body);font-size:16px;font-weight:600;cursor:pointer;min-height:42px;touch-action:manipulation}
+.picwrap{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.pic{width:100%;max-width:320px;height:auto;align-self:center;display:block}
+.piccap{margin:0;font-size:16px;line-height:1.6}
+.solve{background:var(--hint);border-radius:14px;padding:12px 14px}
+.solve>b{font-family:var(--display);font-size:19px;display:block;margin-bottom:6px}
+.steps{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:8px;font-size:17px;line-height:1.6}
+.steps+.steps{margin-top:8px}
+.steps li.cur{font-weight:700}
+.steps .sa{display:inline-block;margin-inline-start:8px;background:var(--good-soft);color:var(--good);border-radius:999px;padding:0 10px;font-family:var(--display);font-weight:700;unicode-bidi:isolate}
+.steps .sa.rev{background:var(--card);color:var(--muted);border:1px solid var(--line)}
+.twintag{align-self:flex-start;background:var(--gold);color:var(--night);border-radius:999px;padding:2px 12px;font-size:14px;font-weight:700}
 
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;direction:ltr}
 .key{font-family:var(--display);font-size:28px;font-weight:600;min-height:58px;border-radius:14px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;touch-action:manipulation}
@@ -140,7 +153,7 @@ footer a{color:inherit}
 <footer class="gut"><div class="inner" id="credits"></div></footer>
 
 <script type="module">
-import { genDay, isRight, pointsFor, levelFor, LEVEL_NAMES, PLAYERS, NAME, TOTAL, MAX_ROUND } from './questions.js?v=4';
+import { genDay, genTwin, isRight, pointsFor, levelFor, LEVEL_NAMES, PLAYERS, NAME, TOTAL, MAX_ROUND, TWIN_BONUS } from './questions.js?v=5';
 
 const $ = id => document.getElementById(id);
 const keyOf = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -166,7 +179,7 @@ function pickLevel(){
 }
 
 let server = { points: null, today: null, best: null, streak: 0 };
-let cur = { input:'', tries:0, resolved:false, fb:null, hint:false, shake:false, pop:-1 };
+let cur = blank();
 let sending = false;
 pickLevel();
 
@@ -200,7 +213,7 @@ async function refresh(){
 async function submit(){
   if(sending) return; sending = true; render();
   try{
-    const body = JSON.stringify({ app:'reef-fbm', date: dayKey, level, round: ROUND, answers: local.results.map(r => ({ given:r.given, tries:r.tries })), sentAt: new Date().toISOString() });
+    const body = JSON.stringify({ app:'reef-fbm', date: dayKey, level, round: ROUND, answers: local.results.map(r => ({ given:r.given, tries:r.tries, twin:r.twin })), sentAt: new Date().toISOString() });
     const r = await fetch(CHANNEL, { method:'POST', body });
     if(!r.ok) throw new Error('http ' + r.status);
     local.sent = true; local.sentAt = Date.now(); local.sendError = false; saveLocal();
@@ -214,8 +227,10 @@ function inputHtml(s){
   if(s.includes('/')){ const [a,b] = s.split('/'); return `<span class="fr"><span>${a||'&nbsp;'}</span><span>${b||'&nbsp;&nbsp;'}</span></span>`; }
   return s;
 }
+// the keypad works for the question, for a step of "solving together" and for the twin
+function typing(){ return cur.flow === 'steps' || (cur.flow === 'twin' && !cur.twinDone) || (!cur.resolved && !finished()); }
 function press(k){
-  if(cur.resolved || finished()) return;
+  if(!typing()) return;
   if(k === 'back') cur.input = cur.input.slice(0,-1);
   else if(k === '/'){ if(cur.input && !cur.input.includes('/')) cur.input += '/'; }
   else if(cur.input.replace('/','').length < 6) cur.input += k;
@@ -224,13 +239,19 @@ function press(k){
   const fb = $('fb'); if(fb){ fb.className = 'fb'; fb.textContent = ''; }
 }
 const GOALS = ['גוווול!','איזה שער!','בול בחיבורים!','גול של אלופים!','פגיעה מושלמת!'];
+function badInput(){
+  if(/^\d+(\/\d+)?$/.test(cur.input)) return false;
+  cur.fb = { t:'info', m: cur.input.includes('/') ? 'צריך לכתוב גם את המספר העליון וגם את התחתון של השבר' : 'קודם כותבים תשובה' };
+  render(); return true;
+}
+/* learning (16.11.26): a miss -> solving it together step by step -> a twin question (+TWIN_BONUS) */
 function check(){
+  if(cur.flow === 'steps') return checkStep();
+  if(cur.flow === 'stepsDone') return startTwin();
+  if(cur.flow === 'twin') return checkTwin();
   if(cur.resolved){ next(); return; }
   const i = local.results.length, q = Q[i];
-  if(!/^\d+(\/\d+)?$/.test(cur.input)){
-    cur.fb = { t:'info', m: cur.input.includes('/') ? 'צריך לכתוב גם את המספר העליון וגם את התחתון של השבר' : 'קודם כותבים תשובה' };
-    render(); return;
-  }
+  if(badInput()) return;
   cur.tries++;
   if(isRight(cur.input, q.answer)){
     const pts = cur.tries === 1 ? 10 : 5;
@@ -238,11 +259,48 @@ function check(){
     resolve(true);
   } else if(cur.tries < 2){
     cur.fb = { t:'bad', m:'כמעט! הכדור פגע בקורה. הנה רמז, נסה שוב' };
-    cur.hint = true; cur.input = ''; cur.shake = true;
+    cur.hint = true; cur.pic = true; cur.input = ''; cur.shake = true;
   } else {
-    cur.fb = { t:'bad', m:'הפעם החמצת. התשובה הנכונה היא ' + q.ans };
-    cur.hint = true;
     resolve(false);
+    if(q.steps && q.steps.length){
+      cur.fb = { t:'bad', m:'הפעם החמצת. לא נורא, בוא נפתור את זה ביחד, שלב אחרי שלב' };
+      cur.flow = 'steps'; cur.hint = false; cur.pic = true; cur.input = '';
+    } else { cur.fb = { t:'bad', m:'הפעם החמצת. התשובה הנכונה היא ' + q.ans }; cur.hint = true; }
+  }
+  render();
+}
+function checkStep(){
+  const q = Q[local.results.length - 1], s = q.steps[cur.step];
+  if(badInput()) return;
+  cur.stepTries++;
+  if(isRight(cur.input, s.a)){ cur.stepLog.push(true); cur.fb = { t:'good', m:'נכון! 👍' }; advance(q); }
+  else if(cur.stepTries < 2){ cur.fb = { t:'bad', m:'לא בדיוק, נסה שוב' }; cur.input = ''; cur.shake = true; }
+  else { cur.stepLog.push(false); cur.fb = { t:'info', m:`זה ${s.ans}. ממשיכים` }; advance(q); }
+  render();
+}
+function advance(q){
+  cur.step++; cur.stepTries = 0; cur.input = '';
+  if(cur.step >= q.steps.length){ cur.flow = 'stepsDone'; cur.fb = { t:'good', m:`<span class="goal">פתרנו!</span>התשובה היא ${q.ans}` }; }
+}
+function startTwin(){
+  cur.twin = genTwin(dayKey, level, ROUND, local.results.length - 1);
+  if(!cur.twin){ next(); return; }
+  Object.assign(cur, { flow:'twin', twinTries:0, twinDone:false, input:'', fb:null, hint:false, pic:false, how:false });
+  render(); window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function checkTwin(){
+  if(cur.twinDone){ next(); return; }
+  if(badInput()) return;
+  const t = cur.twin, r = local.results[local.results.length - 1];
+  cur.twinTries++;
+  if(isRight(cur.input, t.answer)){
+    r.twin = cur.input; r.twinOk = true; saveLocal(); cur.twinDone = true;
+    cur.fb = { t:'good', m:`<span class="goal">למדת! 🧠</span>+${TWIN_BONUS} נקודות בונוס` };
+  } else if(cur.twinTries < 2){
+    cur.fb = { t:'bad', m:'כמעט! הנה רמז, נסה שוב' }; cur.hint = true; cur.pic = true; cur.input = ''; cur.shake = true;
+  } else {
+    r.twin = cur.input; r.twinOk = false; saveLocal(); cur.twinDone = true; cur.hint = false; cur.how = true;
+    cur.fb = { t:'bad', m:`התשובה היא ${t.ans}. ככה פותרים:` };
   }
   render();
 }
@@ -251,10 +309,13 @@ function resolve(ok){
   local.results.push({ ok, tries: cur.tries, given: cur.input });
   cur.resolved = true; cur.pop = local.results.length - 1;
   saveLocal();
-  if(local.results.length >= TOTAL) submit();
+  if(ok && local.results.length >= TOTAL) submit();   // a miss is sent after its twin (next())
 }
+function blank(){ return { input:'', tries:0, resolved:false, fb:null, hint:false, shake:false, pop:-1, pic:false, how:false,
+                           flow:null, step:0, stepTries:0, stepLog:[], twin:null, twinTries:0, twinDone:false }; }
 function next(){
-  cur = { input:'', tries:0, resolved:false, fb:null, hint:false, shake:false, pop:-1 };
+  if(local.results.length >= TOTAL && !local.sent && !sending) submit();
+  cur = blank();
   render(); window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 const finished = () => !!server.today || local.results.length >= TOTAL;
@@ -296,21 +357,42 @@ function renderQuiz(){
     + `<button class="key" data-k="/" type="button" aria-label="קו שבר">⁄<small>שבר</small></button>`
     + `<button class="key" data-k="0" type="button">0</button>`
     + `<button class="key" data-k="back" type="button" aria-label="מחיקה">⌫<small>מחיקה</small></button>`;
+  const fl = cur.flow, tw = fl === 'twin', v = tw ? cur.twin : q;   // v = the question on screen
+  const stepsList = (steps, upto, log) => `<ol class="steps">${steps.slice(0, upto).map((s, i) =>
+      `<li>${s.text}<span class="sa${log && log[i] === false ? ' rev' : ''}">${log && log[i] === false ? '' : '✓ '}${s.ans}</span></li>`).join('')}</ol>`;
+  let box = '';
+  if(fl === 'steps' || fl === 'stepsDone'){
+    box = `<div class="solve"><b>בוא נפתור ביחד</b>${stepsList(q.steps, cur.step, cur.stepLog)}
+      ${fl === 'steps' ? `<ol class="steps" start="${cur.step + 1}"><li class="cur">${q.steps[cur.step].text}</li></ol>` : ''}</div>`;
+  }
+  let answer = '';
+  if(fl === 'steps' || (tw && !cur.twinDone) || (!fl && !cur.resolved)) answer = `<div class="answer${cur.shake ? ' shake' : ''}" id="ans" aria-label="התשובה שלך">${inputHtml(cur.input)}</div>`;
+  else if(!fl && r) answer = `<div class="answer ${r.ok ? 'ok' : 'bad'}" id="ans">${inputHtml(r.given)}</div>`;
+  else if(tw) answer = `<div class="answer ${r.twinOk ? 'ok' : 'bad'}" id="ans">${inputHtml(r.twin)}</div>`;
+  const how = (!fl && r && r.ok) || (tw && cur.twinDone);   // "how do you solve it" after a right answer / the twin
+  const go = fl === 'steps' ? 'בדיקה' : fl === 'stepsDone' ? 'עכשיו אתה! לתרגיל דומה ⚽'
+    : (tw ? cur.twinDone : cur.resolved) ? (last ? 'שריקת סיום: לתוצאות' : 'לשאלה הבאה') : 'בעיטה לשער!';
   $('main').innerHTML = `<section class="card" aria-live="polite">
     <div class="player"><img src="${photo(q.player)}" alt="${pl.he}" width="68" height="68"><div class="who"><b>${pl.he}</b><span>${pl.team}</span></div>
       <div class="qno">שאלה<b>${idx+1}/${TOTAL}</b></div></div>
-    <span class="cat">${q.cat}</span>
-    ${levelUpBanner()}
-    <p class="qtext">${q.html}</p>
-    ${q.fig || ''}
-    <div class="answer${r ? (r.ok ? ' ok' : ' bad') : ''}${cur.shake ? ' shake' : ''}" id="ans" aria-label="התשובה שלך">${inputHtml(r ? r.given : cur.input)}</div>
+    ${tw ? `<span class="twintag">🧩 תרגיל תאום · +${TWIN_BONUS} בונוס</span>` : `<span class="cat">${q.cat}</span>`}
+    ${tw ? '' : levelUpBanner()}
+    <p class="qtext">${v.html}</p>
+    ${v.fig || ''}
+    ${v.pic ? `<button class="picbtn" id="picbtn" type="button" aria-expanded="${cur.pic}">${cur.pic ? 'להסתיר את הציור' : '📐 תראה לי בציור'}</button>${cur.pic ? v.pic : ''}` : ''}
+    ${box}
+    ${answer}
     <p class="fb ${cur.fb ? cur.fb.t : ''}" id="fb">${cur.fb ? cur.fb.m : ''}</p>
-    ${cur.hint ? `<div class="hint"><b>${cur.resolved ? 'איך פותרים' : 'רמז מהמאמן'}</b>${q.hint}</div>` : ''}
-    ${cur.resolved ? '' : `<div class="pad" id="pad">${keys}</div>`}
-    <button class="go${cur.resolved ? ' next' : ''}" id="go" type="button">${cur.resolved ? (last ? 'שריקת סיום: לתוצאות' : 'לשאלה הבאה') : 'בעיטה לשער!'}</button>
+    ${cur.hint ? `<div class="hint"><b>${cur.resolved && !tw ? 'איך פותרים' : 'רמז מהמאמן'}</b>${v.hint}</div>` : ''}
+    ${how && v.steps && v.steps.length ? (cur.how ? `<div class="solve"><b>איך פותרים</b>${stepsList(v.steps, v.steps.length)}</div>`
+                                                 : `<button class="picbtn" id="howbtn" type="button">💡 איך פותרים?</button>`) : ''}
+    ${typing() ? `<div class="pad" id="pad">${keys}</div>` : ''}
+    <button class="go${typing() ? '' : ' next'}" id="go" type="button">${go}</button>
   </section>`;
   const pad = $('pad'); if(pad) pad.addEventListener('click', e => { const b = e.target.closest('[data-k]'); if(b) press(b.dataset.k); });
   $('go').addEventListener('click', check);
+  const pb = $('picbtn'); if(pb) pb.addEventListener('click', () => { cur.pic = !cur.pic; render(); });
+  const hb = $('howbtn'); if(hb) hb.addEventListener('click', () => { cur.how = true; render(); });
   cur.shake = false;
 }
 function untilTomorrow(){
@@ -324,7 +406,7 @@ function renderDone(){
   const rows = Q.map((q, i) => {
     const r = day ? day.items[i] : local.results[i]; const ok = r && r.ok; const pts = day ? r.pts : pointsFor(r);
     return `<li><img src="${photo(q.player)}" alt="" width="38" height="38"><span class="mark ${ok ? 'y' : 'n2'}" aria-label="${ok ? 'נכון' : 'לא נכון'}">${ok ? '✓' : '✗'}</span>
-      <span class="t">${q.cat} · התשובה: <b>${q.ans}</b></span><span class="pts">${pts ? '+' + pts : '0'}</span></li>`;
+      <span class="t">${q.cat} · התשובה: <b>${q.ans}</b>${r && r.twinOk ? ' · 🧩 תאום' : ''}</span><span class="pts">${pts ? '+' + pts : '0'}</span></li>`;
   }).join('');
   const score = day ? day.score : local.results.filter(r => r.ok).length;
   const earned = day ? day.earned : localEarned();
