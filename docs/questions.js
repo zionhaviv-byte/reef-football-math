@@ -39,7 +39,7 @@ export function toPlain(html){
 /* ---------- fractions ---------- */
 // g.easy = the easier level 1 (Zion 16.11.26, after Reef's teacher said it is hard): one step only, small numbers
 function fracOf(g,p){
-  const d=g.easy?g.pick([2,3,4,5]):g.pick([2,3,4,5,6,8,10]), a=d===2||g.easy?1:g.ri(1,d-1), k=g.easy?g.ri(2,10):g.ri(2,d>=8?6:12), T=d*k, part=k*a, fr=F(a,d);
+  const d=g.tiny?g.pick([2,3,4]):g.easy?g.pick([2,3,4,5]):g.pick([2,3,4,5,6,8,10]), a=d===2||g.easy?1:g.ri(1,d-1), k=g.tiny?g.ri(2,5):g.easy?g.ri(2,10):g.ri(2,d>=8?6:12), T=d*k, part=k*a, fr=F(a,d);
   const html=g.pick([
     ()=>`${P(p)} בעט ${N(T)} בעיטות לשער באימון. ${fr} מהבעיטות נכנסו לרשת. כמה בעיטות נכנסו לרשת?`,
     ()=>`במשחק של ברצלונה ${P(p)} מסר ${N(T)} מסירות. ${fr} מהמסירות היו מסירות קדימה. כמה מסירות קדימה הוא מסר?`,
@@ -50,7 +50,7 @@ function fracOf(g,p){
     hint:`קודם מחלקים את ${N(T)} ל-${N(d)} חלקים שווים: ${X(`${T} ÷ ${d} = ${k}`)}. `+(a>1?`ואז לוקחים ${N(a)} חלקים: ${X(`${k} × ${a}`)}.`:`לוקחים חלק אחד, אז זו התשובה.`)};
 }
 function fracAdd(g,p){
-  const d=g.easy?g.pick([3,4,5,6]):g.pick([5,6,7,8,9,10,12]), a=g.ri(1,d-2), b=g.ri(1,d-1-a), s=a+b;
+  const d=g.tiny?g.pick([3,4,5]):g.easy?g.pick([3,4,5,6]):g.pick([5,6,7,8,9,10,12]), a=g.ri(1,d-2), b=g.ri(1,d-1-a), s=a+b;
   const html=g.pick([
     ()=>`${P(p)} שתה ${F(a,d)} מבקבוק המים במחצית הראשונה, ועוד ${F(b,d)} מהבקבוק במחצית השנייה. איזה חלק מהבקבוק הוא שתה?`,
     ()=>`ביום ראשון ${NAME} צבע ${F(a,d)} מהציור של ${P(p)}, וביום שני עוד ${F(b,d)} מהציור. איזה חלק מהציור הוא צבע בסך הכול?`,
@@ -60,7 +60,7 @@ function fracAdd(g,p){
     hint:`כשהמכנים שווים, מחברים רק את המונים: ${X(`${a} + ${b} = ${s}`)}, והמכנה נשאר ${N(d)}. כותבים שבר עם הכפתור ⁄.`};
 }
 function fracSub(g,p){
-  const d=g.easy?g.pick([2,3,4,5]):g.pick([3,4,5,6,8,10]), a=g.ri(1,d-1);
+  const d=g.tiny?g.pick([2,3,4]):g.easy?g.pick([2,3,4,5]):g.pick([3,4,5,6,8,10]), a=g.ri(1,d-1);
   const html=g.pick([
     ()=>`${P(p)} כבר סיים ${F(a,d)} מהאימון של היום. איזה חלק מהאימון נשאר לו?`,
     ()=>`${F(a,d)} מהכרטיסים למשחק של ברצלונה כבר נמכרו. איזה חלק מהכרטיסים עוד לא נמכר?`,
@@ -123,6 +123,7 @@ function mulHint(a,b){
 }
 function mul1(g,p){
   const L=g.lvl;
+  if(L===1&&g.tiny) return mulStory(g,p,g.ri(2,10),g.ri(2,5));
   if(L===1) return mulStory(g,p,g.ri(3,10),g.ri(3,10));
   if(L===2) return mulStory(g,p,g.ri(12,49),g.ri(3,9));
   if(L===3) return g.ri(0,2)===0?mulStory(g,p,g.ri(105,450),g.ri(2,6)):mulStory(g,p,g.ri(13,96),g.ri(3,9));
@@ -131,6 +132,7 @@ function mul1(g,p){
 // level 1 mixes both kinds (Zion, 16.11.26: "גם וגם, לא רק לוח הכפל"): mul1 = the table, mul2 = something bigger
 function mul2(g,p){
   const L=g.lvl;
+  if(L===1&&g.tiny) return g.ri(0,1)===0?mulStory(g,p,g.ri(1,5)*10,g.ri(2,3)):mulStory(g,p,g.ri(11,15),2);
   if(L===1&&g.easy) return g.ri(0,1)===0?mulStory(g,p,g.ri(1,5)*10,g.ri(2,5)):mulStory(g,p,g.ri(11,20),g.ri(2,3));
   if(L===1) return g.ri(0,1)===0?mulStory(g,p,g.ri(2,9)*10,g.ri(2,9)):mulStory(g,p,g.ri(12,29),g.ri(2,5));
   if(L===2) return g.ri(0,1)===0?mulStory(g,p,g.ri(12,48),g.pick([10,20,30])):mulStory(g,p,g.ri(101,250),g.ri(2,4));
@@ -140,7 +142,8 @@ function mul2(g,p){
 function area(g,p){
   const L=g.lvl;
   let w,h;
-  if(L===1&&g.easy){w=g.ri(3,9);h=g.ri(2,Math.min(5,w-1));}
+  if(L===1&&g.tiny){w=g.ri(3,6);h=g.ri(2,Math.min(4,w-1));}
+  else if(L===1&&g.easy){w=g.ri(3,9);h=g.ri(2,Math.min(5,w-1));}
   else if(L===1){w=g.ri(5,10);h=g.ri(3,w-1);}
   else if(L===2){w=g.pick([10,20,30]);h=g.ri(4,12);}
   else if(L===3){w=g.pick([20,30,40,50]);h=g.ri(11,25);}
@@ -178,7 +181,7 @@ function figBox(a,b,c){ return FIG('0 0 260 190',
   (a?LBL(100,188,a):'')+(b?LBL(206,166,b,'start'):'')+(c?LBL(22,126,c,'end'):'')); }
 
 function rectPerim(g,p){
-  const L=g.lvl, w=L===1?g.ri(g.easy?3:5,g.easy?10:12):L===2?g.ri(4,10)*5:g.ri(4,10)*10, h=L===1?g.ri(2,w-2):L===2?g.ri(2,w/5-1)*5:g.ri(2,w/10-1)*10;
+  const L=g.lvl, w=L===1?g.ri(g.easy?3:5,g.tiny?7:g.easy?10:12):L===2?g.ri(4,10)*5:g.ri(4,10)*10, h=L===1?g.ri(2,w-2):L===2?g.ri(2,w/5-1)*5:g.ri(2,w/10-1)*10;
   const html=g.pick([
     ()=>`${P(p)} רץ סיבוב אחד מסביב למגרש אימון בצורת מלבן, באורך ${N(w)} מטר וברוחב ${N(h)} מטר. כמה מטרים הוא רץ?`,
     ()=>`${NAME} רוצה לצבוע קו לבן מסביב למגרש קטן בצורת מלבן, באורך ${N(w)} מטר וברוחב ${N(h)} מטר. כמה מטרים של קו הוא צריך לצבוע?`
@@ -187,7 +190,7 @@ function rectPerim(g,p){
     hint:`היקף זה סכום כל ארבע הצלעות: ${X(`${w} + ${h} + ${w} + ${h}`)}. או: ${X(`(${w} + ${h}) × 2`)}.`};
 }
 function square(g,p){
-  const L=g.lvl, s=L===1?g.ri(3,10):g.ri(6,25), v=g.ri(0,2);
+  const L=g.lvl, s=L===1?(g.tiny?g.ri(2,6):g.ri(3,10)):g.ri(6,25), v=g.ri(0,2);
   if(v===0) return {cat:'הנדסה · ריבוע',html:`בחדר הכושר של ברצלונה יש מזרן בצורת ריבוע, וכל צלע שלו ${N(s)} מטר. מה ההיקף של המזרן?`,answer:4*s,ans:N(4*s),fig:figSquare(s),t:{kind:'sqPerim',s},
     hint:`בריבוע כל 4 הצלעות שוות. ההיקף: ${X(`${s} × 4`)}.`};
   if(v===1) return {cat:'הנדסה · ריבוע',html:`${P(p)} רץ מסביב לריבוע שסימן המאמן על הדשא. ההיקף של הריבוע ${N(4*s)} מטר. מה האורך של כל צלע?`,answer:s,ans:N(s),fig:figSquare('?'),t:{kind:'sqSide',s},
@@ -201,7 +204,7 @@ function missingSide(g,p){
     hint:`שטח = אורך × רוחב, אז שואלים: ${N(w)} כפול כמה זה ${N(A)}? כלומר ${X(`${A} ÷ ${w}`)}.`};
 }
 function triangle(g,p){
-  const v=g.easy?g.pick([0,2]):g.ri(0,2), s=g.easy?g.ri(2,10):g.ri(3,15), b=g.ri(3,g.easy?9:12);
+  const v=g.easy?g.pick([0,2]):g.ri(0,2), s=g.tiny?g.ri(2,6):g.easy?g.ri(2,10):g.ri(3,15), b=g.ri(g.tiny?2:3,g.tiny?6:g.easy?9:12);
   if(v===0) return {cat:'הנדסה · משולש',html:`דגלון פינה בצורת משולש שווה צלעות. כל צלע ${N(s)} סנטימטר. מה ההיקף של הדגלון?`,answer:3*s,ans:N(3*s),fig:figTri(s,s,s),t:{kind:'triEq',s},
     hint:`במשולש שווה צלעות כל 3 הצלעות שוות: ${X(`${s} × 3`)}.`};
   if(v===1) return {cat:'הנדסה · משולש',html:`למשולש שווה צלעות יש היקף של ${N(3*s)} סנטימטר. מה האורך של כל צלע?`,answer:s,ans:N(s),fig:figTri('?','?','?'),t:{kind:'triSide',s},
@@ -211,7 +214,7 @@ function triangle(g,p){
 }
 function box(g,p){
   const L=g.lvl, v=g.easy?0:g.ri(0,2);   // easy: only how many faces / edges / vertices
-  if(v===0){const n=g.ri(2,L===1?5:9), part=g.pick([['פאות',6,'פאה'],['מקצועות',12,'מקצוע'],['קודקודים',8,'קודקוד']]);
+  if(v===0){const n=g.ri(2,g.tiny?3:L===1?5:9), part=g.pick([['פאות',6,'פאה'],['מקצועות',12,'מקצוע'],['קודקודים',8,'קודקוד']]);
     return {cat:'הנדסה · תיבה',html:`הנעליים החדשות של ${P(p)} הגיעו בקופסה בצורת תיבה. במחסן יש ${N(n)} קופסאות כאלה. כמה ${part[0]} יש לכל הקופסאות ביחד?`,answer:n*part[1],ans:N(n*part[1]),fig:figBox('','',''),t:{kind:'boxCount',n,per:part[1],name:part[0],one:part[2]},
       hint:`לכל תיבה יש ${N(6)} פאות, ${N(12)} מקצועות ו-${N(8)} קודקודים. לקופסה אחת יש ${N(part[1])} ${part[0]}, אז: ${X(`${part[1]} × ${n}`)}.`};}
   const a=g.ri(2,L===1?5:8), b=g.ri(2,L===1?4:6), c=g.ri(2,L===1?3:5);
@@ -222,13 +225,13 @@ function box(g,p){
 }
 function polygons(g,p){
   const v=g.ri(0,2);
-  if(v===0){const n=g.ri(2,9);
+  if(v===0){const n=g.ri(2,g.tiny?4:9);
     return {cat:'הנדסה · מצולעים',html:`על כדור הכדורגל הקלאסי יש מחומשים שחורים ומשושים לבנים. כמה צלעות יש בסך הכול ל-${N(n)} משושים?`,answer:6*n,ans:N(6*n),t:{kind:'poly',n,per:6,one:'משושה',what:'צלעות'},
       hint:`למשושה יש ${N(6)} צלעות: ${X(`6 × ${n}`)}.`};}
-  if(v===1){const n=g.ri(2,12);
+  if(v===1){const n=g.ri(2,g.tiny?4:12);
     return {cat:'הנדסה · מצולעים',html:`${NAME} צייר ${N(n)} מחומשים, כמו הכתמים השחורים על כדור כדורגל. כמה צלעות יש לכל המחומשים ביחד?`,answer:5*n,ans:N(5*n),t:{kind:'poly',n,per:5,one:'מחומש',what:'צלעות'},
       hint:`למחומש יש ${N(5)} צלעות: ${X(`5 × ${n}`)}.`};}
-  const n=g.ri(2,9);
+  const n=g.ri(2,g.tiny?4:9);
   return {cat:'הנדסה · מלבן',html:`על הדשא סימנו ${N(n)} מגרשים קטנים בצורת מלבן. כמה זוויות ישרות יש בכל המלבנים ביחד?`,answer:4*n,ans:N(4*n),fig:figRect(3,2,'',''),t:{kind:'poly',n,per:4,one:'מלבן',what:'זוויות ישרות'},
     hint:`לכל מלבן יש ${N(4)} זוויות ישרות: ${X(`4 × ${n}`)}.`};
 }
@@ -236,8 +239,8 @@ function polygons(g,p){
 /* ---------- other ---------- */
 function div(g,p){
   const L=g.lvl;
-  const k=L===1?g.ri(2,9):L===2?g.ri(2,5):g.ri(3,9);
-  const q=L===1?g.ri(2,10):L===2?g.ri(11,20):L===3?g.ri(12,28):g.ri(21,99);
+  const k=L===1&&g.tiny?g.ri(2,5):L===1?g.ri(2,9):L===2?g.ri(2,5):g.ri(3,9);
+  const q=L===1&&g.tiny?g.ri(2,5):L===1?g.ri(2,10):L===2?g.ri(11,20):L===3?g.ri(12,28):g.ri(21,99);
   const T=k*q;
   const html=g.pick([
     ()=>`${NAME} אסף ${N(T)} מדבקות של שחקני ברצלונה, וחילק אותן שווה בשווה ל-${N(k)} עמודים באלבום. כמה מדבקות יש בכל עמוד?`,
@@ -262,13 +265,13 @@ function multiStep(g,p){
 }
 function time(g,p){
   const v=g.ri(0,2);
-  if(v===0){const m=g.ri(12,64);
+  if(v===0){const m=g.tiny?g.ri(1,6)*10:g.ri(12,64);
     return {cat:'זמן',html:`משחק כדורגל נמשך ${N(90)} דקות. ${P(p)} נכנס כמחליף ושיחק ${N(m)} דקות עד הסוף. כמה דקות הוא ישב על הספסל?`,answer:90-m,ans:N(90-m),t:{kind:'bench',m},
       hint:`מחסרים מכל המשחק את הזמן ששיחק: ${X(`90 − ${m}`)}.`};}
-  if(v===1){const n=g.easy?g.ri(2,4):g.ri(3,8);
+  if(v===1){const n=g.tiny?g.ri(2,3):g.easy?g.ri(2,4):g.ri(3,8);
     return {cat:'זמן',html:`החודש ברצלונה שיחקה ${N(n)} משחקים, וכל משחק נמשך ${N(90)} דקות. כמה דקות כדורגל היא שיחקה החודש?`,answer:90*n,ans:N(90*n),t:{kind:'games',n},
       hint:`${X(`90 × ${n}`)}. טיפ: ${X(`9 × ${n} = ${9*n}`)}, ומוסיפים אפס.`};}
-  const h=g.ri(1,3), m=g.pick([10,15,20,25,30,40,45,50]);
+  const h=g.tiny?1:g.ri(1,3), m=g.pick(g.tiny?[10,15,20,30]:[10,15,20,25,30,40,45,50]);
   return {cat:'זמן',html:`${P(p)} התאמן ${hours(h)} ו-${N(m)} דקות. כמה דקות הוא התאמן בסך הכול?`,answer:h*60+m,ans:N(h*60+m),t:{kind:'hm',h,m},
     hint:`בכל שעה יש ${N(60)} דקות: ${X(`${h} × 60 = ${h*60}`)}. ועכשיו מוסיפים עוד ${N(m)} דקות.`};
 }
@@ -444,9 +447,42 @@ function teach(q){
 
 // round 2+ = a retry ("אימון חוזר", Zion 16.11.26): 5 new questions, same day and level. Round 1 keeps the old seed.
 export const MAX_ROUND = 4;
+/* ---------- a level per topic, from 17.11.26 (Zion: "אולי הוא חזק בשברים אבל חלש בהנדסה") ----------
+   level = {mul, frac, geo, other}, each 1-5. Every week each topic goes up on its own (tools/poller.py).
+   1 = very easy (g.tiny), 2 = the easy level 1 (g.easy), 3-5 = the old levels 2-4. Days before 17.11 keep the old single level. */
+export const TOPIC_FROM = '2026-11-17';
+export const TOPICS = { mul:'כפל', frac:'שברים', geo:'הנדסה', other:'חילוק וזמן' };
+export const TOPIC_MAX = 5;
+export const TOPIC_LEVEL_NAMES = {1:'ממש קל', 2:'קל', 3:'בינוני', 4:'קשה', 5:'הכי קשה'};
+const TOPIC_OF = f => f===mul1||f===mul2 ? 'mul' : [fracOf,fracAdd,fracSub,fracRemain].includes(f) ? 'frac'
+                    : [div,multiStep,time].includes(f) ? 'other' : 'geo';
+const DIFF = n => n<=1 ? {lvl:1,easy:true,tiny:true} : n===2 ? {lvl:1,easy:true,tiny:false} : {lvl:Math.min(4,n-1),easy:false,tiny:false};
+export function normLevels(level){
+  const o={};
+  for(const t in TOPICS){const v=level&&typeof level==='object'?level[t]:level; o[t]=Math.min(TOPIC_MAX,Math.max(1,parseInt(v,10)||1));}
+  return o;
+}
+function buildTopics(key, L, rd){
+  const r=rng(seedOf('reef-football-g4|'+key+'|T'+L.mul+L.frac+L.geo+L.other+(rd>1?'|R'+rd:'')));
+  const g={ri:(a,b)=>a+Math.floor(r()*(b-a+1)),pick:arr=>arr[Math.floor(r()*arr.length)]};
+  const shuffle=arr=>{const c=arr.slice();for(let i=c.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[c[i],c[j]]=[c[j],c[i]]}return c};
+  const D={}; for(const t in L) D[t]=DIFF(L[t]);
+  const fr=shuffle(D.frac.easy?[fracOf,fracOf,fracAdd,fracSub]:[fracOf,fracAdd,fracSub,fracRemain]);
+  const geo=g.pick(D.geo.easy?[area,rectPerim,square,triangle,box,polygons]:[area,rectPerim,square,missingSide,triangle,box,box,polygons]);
+  const extra=g.pick(D.other.easy?[fr[1],div,time]:[fr[1],fr[1],div,multiStep,time]);
+  const used=new Set();
+  const items=shuffle([fr[0],mul1,mul2,geo,extra]).map(f=>{
+    let p; for(let t=0;t<6;t++){p=g.pick(f===fracOf||f===mul1?BARCA:PICKS); if(!used.has(p)) break}
+    used.add(p);
+    const tk=TOPIC_OF(f); Object.assign(g,D[tk]);
+    const q=f(g,p); q.player=p; q.tk=tk; return {q,f,p,diff:D[tk]};
+  });
+  return {lvl:'T'+L.mul+L.frac+L.geo+L.other,rd,items};
+}
 function build(key, level=1, round=1){
-  const lvl=Math.min(MAX_LEVEL,Math.max(1,parseInt(level,10)||1));
   const rd=Math.min(MAX_ROUND,Math.max(1,parseInt(round,10)||1));
+  if(key>=TOPIC_FROM) return buildTopics(key, normLevels(level), rd);
+  const lvl=Math.min(MAX_LEVEL,Math.max(1,parseInt(level&&typeof level==='object'?1:level,10)||1));
   const r=rng(seedOf('reef-football-g4|'+key+'|L'+lvl+(rd>1?'|R'+rd:'')));
   // easier level 1 from 17.11.26 (Reef's teacher: too hard). 16.11 rounds 1-2 were already played, so they keep the old questions
   const easy=lvl===1&&(key>'2026-11-16'||rd>=3);
@@ -464,9 +500,9 @@ function build(key, level=1, round=1){
     // a different player for each question when possible
     let p; for(let t=0;t<6;t++){p=g.pick(f===fracOf||f===mul1?BARCA:PICKS); if(!used.has(p)) break}
     used.add(p);
-    const q=f(g,p); q.player=p; return {q,f,p};
+    const q=f(g,p); q.player=p; q.tk=TOPIC_OF(f); return {q,f,p,diff:{lvl,easy}};
   });
-  return {lvl,rd,easy,items};
+  return {lvl,rd,items};
 }
 export function genDay(key, level=1, round=1){ return build(key,level,round).items.map(x=>teach(x.q)); }
 // the twin of question i (תרגיל תאום): the same kind of question with other numbers, after he missed it
@@ -476,8 +512,8 @@ export function genTwin(key, level=1, round=1, i=0){
   let q;
   for(let t=0;t<8;t++){
     const r=rng(seedOf('reef-twin|'+key+'|L'+b.lvl+'|R'+b.rd+'|'+i+'|'+t));
-    const g={lvl:b.lvl,easy:b.easy,ri:(a,c)=>a+Math.floor(r()*(c-a+1)),pick:arr=>arr[Math.floor(r()*arr.length)]};
-    q=it.f(g,it.p); q.player=it.p;
+    const g={...it.diff,ri:(a,c)=>a+Math.floor(r()*(c-a+1)),pick:arr=>arr[Math.floor(r()*arr.length)]};
+    q=it.f(g,it.p); q.player=it.p; q.tk=it.q.tk;
     if(q.answer!==it.q.answer) break;
   }
   return teach(q);
@@ -494,7 +530,8 @@ export function isRight(given,answer){const v=parseAnswer(given);return isFinite
 export const TWIN_BONUS = 3;
 export function pointsFor(r){if(!r) return 0; return (r.ok?(r.tries===1?POINTS_FIRST:POINTS_SECOND):0)+(!r.ok&&r.twinOk?TWIN_BONUS:0)}
 
-// level in force on a date: levels = [{from:'YYYY-MM-DD', level}], sorted by from
+// level in force on a date: levels = [{from:'YYYY-MM-DD', level, topics?}], sorted by from.
+// From 17.11.26 an entry has topics = {mul, frac, geo, other} and that object is the level.
 export function levelFor(date, levels){
-  let l=1; for(const x of (levels||[])) if(x.from<=date) l=x.level; return l;
+  let l=1; for(const x of (levels||[])) if(x.from<=date) l=x.topics||x.level; return l;
 }
